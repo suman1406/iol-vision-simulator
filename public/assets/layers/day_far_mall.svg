@@ -1,0 +1,104 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="640" viewBox="0 0 960 640">
+  <defs>
+    <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#bfdbfe"/>
+      <stop offset="60%" stop-color="#e0f2fe"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+    <linearGradient id="atriumGlass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#93c5fd" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.95"/>
+    </linearGradient>
+    <linearGradient id="wallGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f1f5f9"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+    <linearGradient id="marbleFloor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e2e8f0"/>
+      <stop offset="40%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <radialGradient id="sunbeam" cx="50%" cy="10%" r="70%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.6"/>
+      <stop offset="50%" stop-color="#fef08a" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Sky & Glass Vaulted Atrium -->
+  <rect x="0" y="0" width="960" height="640" fill="url(#wallGrad)"/>
+  <path d="M 120 0 Q 480 180 840 0 Z" fill="url(#skyGrad)"/>
+  <path d="M 120 0 Q 480 180 840 0" stroke="#334155" stroke-width="6" fill="none"/>
+  
+  <!-- Steel Atrium Ribs -->
+  <line x1="240" y1="0" x2="320" y2="105" stroke="#475569" stroke-width="3"/>
+  <line x1="360" y1="0" x2="400" y2="128" stroke="#475569" stroke-width="3"/>
+  <line x1="480" y1="0" x2="480" y2="135" stroke="#475569" stroke-width="3"/>
+  <line x1="600" y1="0" x2="560" y2="128" stroke="#475569" stroke-width="3"/>
+  <line x1="720" y1="0" x2="640" y2="105" stroke="#475569" stroke-width="3"/>
+  <circle cx="480" cy="180" r="420" fill="url(#sunbeam)"/>
+
+  <!-- Upper Tier Storefronts (Level 3) -->
+  <rect x="80" y="110" width="800" height="90" fill="#334155"/>
+  <rect x="90" y="115" width="780" height="80" fill="#1e293b"/>
+  <!-- Level 3 Signage -->
+  <rect x="140" y="125" width="200" height="35" rx="4" fill="#0f172a" stroke="#d97706" stroke-width="1.5"/>
+  <text x="240" y="148" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#fef08a" text-anchor="middle" letter-spacing="3">TIFFANY &amp; CO.</text>
+  
+  <rect x="380" y="125" width="200" height="35" rx="4" fill="#0f172a" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="480" y="148" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#ffffff" text-anchor="middle" letter-spacing="4">GUCCI GALLERIA</text>
+
+  <rect x="620" y="125" width="200" height="35" rx="4" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="720" y="148" font-family="Arial, sans-serif" font-size="15" font-weight="bold" fill="#38bdf8" text-anchor="middle" letter-spacing="3">APPLE STORE</text>
+
+  <!-- Level 3 Glass Balustrade -->
+  <rect x="70" y="195" width="820" height="25" fill="#94a3b8" opacity="0.6"/>
+  <line x1="70" y1="195" x2="890" y2="195" stroke="#cbd5e1" stroke-width="2"/>
+  <line x1="70" y1="220" x2="890" y2="220" stroke="#64748b" stroke-width="3"/>
+
+  <!-- Middle Tier Storefronts (Level 2) -->
+  <rect x="40" y="220" width="880" height="110" fill="#475569"/>
+  <rect x="50" y="225" width="860" height="100" fill="#0f172a"/>
+  <!-- Level 2 Signage -->
+  <rect x="100" y="240" width="220" height="42" rx="5" fill="#1e293b" stroke="#eab308" stroke-width="2"/>
+  <text x="210" y="267" font-family="Georgia, serif" font-size="17" font-weight="bold" fill="#fde047" text-anchor="middle" letter-spacing="2">ROLEX ATELIER</text>
+
+  <rect x="360" y="240" width="240" height="42" rx="5" fill="#1e293b" stroke="#fb7185" stroke-width="2"/>
+  <text x="480" y="267" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle" letter-spacing="3">NESPRESSO BOUTIQUE</text>
+
+  <rect x="640" y="240" width="220" height="42" rx="5" fill="#1e293b" stroke="#4ade80" stroke-width="2"/>
+  <text x="750" y="267" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#86efac" text-anchor="middle" letter-spacing="2">SEPHORA PARIS</text>
+
+  <!-- Level 2 Glass Balustrade -->
+  <rect x="30" y="325" width="900" height="30" fill="#94a3b8" opacity="0.5"/>
+  <line x1="30" y1="325" x2="930" y2="325" stroke="#f1f5f9" stroke-width="3"/>
+  <line x1="30" y1="355" x2="930" y2="355" stroke="#475569" stroke-width="4"/>
+
+  <!-- Level 1 Ground Marble Floor & Atrium Plaza -->
+  <polygon points="0,355 960,355 960,640 0,640" fill="url(#marbleFloor)"/>
+  <!-- Tile grid lines -->
+  <line x1="100" y1="355" x2="0" y2="640" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="280" y1="355" x2="160" y2="640" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="480" y1="355" x2="480" y2="640" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="680" y1="355" x2="800" y2="640" stroke="#cbd5e1" stroke-width="1.5"/>
+  <line x1="860" y1="355" x2="960" y2="640" stroke="#cbd5e1" stroke-width="1.5"/>
+
+  <!-- Distant Shoppers and Planters -->
+  <ellipse cx="260" cy="400" rx="14" ry="4" fill="#64748b" opacity="0.4"/>
+  <rect x="254" y="372" width="12" height="26" rx="4" fill="#3b82f6"/>
+  <circle cx="260" cy="368" r="5" fill="#fdba74"/>
+
+  <ellipse cx="680" cy="410" rx="15" ry="4" fill="#64748b" opacity="0.4"/>
+  <rect x="674" y="380" width="12" height="28" rx="4" fill="#ec4899"/>
+  <circle cx="680" cy="375" r="5" fill="#fbcfe8"/>
+
+  <ellipse cx="710" cy="405" rx="15" ry="4" fill="#64748b" opacity="0.4"/>
+  <rect x="704" y="375" width="12" height="28" rx="4" fill="#10b981"/>
+  <circle cx="710" cy="370" r="5" fill="#fed7aa"/>
+
+  <!-- Central Hanging Chandelier / Mobile -->
+  <line x1="480" y1="0" x2="480" y2="80" stroke="#94a3b8" stroke-width="2"/>
+  <circle cx="480" cy="90" r="18" fill="#fef08a" stroke="#ca8a04" stroke-width="2"/>
+  <line x1="460" y1="100" x2="500" y2="100" stroke="#ca8a04" stroke-width="2"/>
+</svg>

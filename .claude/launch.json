@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "iol-sim", "runtimeExecutable": "python", "runtimeArgs": ["-m", "http.server", "8123", "--directory", "iol-sim"], "port": 8123 }
+  ]
+}

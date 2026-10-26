@@ -1,0 +1,139 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="640" viewBox="0 0 960 640">
+  <defs>
+    <filter id="phoneShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="15" stdDeviation="16" flood-color="#000000" flood-opacity="0.55"/>
+    </filter>
+    <linearGradient id="phoneBody" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="50%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="receiptCard" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Hand holding phone from lower right -->
+  <path d="M 600 640 C 580 520, 560 450, 530 400 C 510 360, 480 355, 470 380 C 460 405, 480 440, 500 480 C 530 530, 550 590, 560 640 Z" fill="#e2a373" opacity="0.95"/>
+  <path d="M 880 640 C 840 540, 800 450, 780 390 C 770 360, 740 370, 735 410 C 730 460, 750 540, 770 640 Z" fill="#cca075"/>
+
+  <!-- Smartphone Case / Bezel (Centered at near right) -->
+  <g transform="translate(480, 80)" filter="url(#phoneShadow)">
+    <!-- Titanium Outer Rim -->
+    <rect x="-6" y="-6" width="452" height="562" rx="36" fill="#64748b" stroke="#94a3b8" stroke-width="2.5"/>
+    <!-- Outer Bezel -->
+    <rect x="0" y="0" width="440" height="550" rx="30" fill="url(#phoneBody)"/>
+    
+    <!-- Phone Screen (High-Resolution OLED Display) -->
+    <rect x="10" y="10" width="420" height="530" rx="22" fill="url(#receiptCard)"/>
+
+    <!-- Dynamic Island / Speaker Pill -->
+    <rect x="165" y="18" width="90" height="18" rx="9" fill="#020617"/>
+    <!-- Status Bar -->
+    <text x="35" y="32" font-family="'Helvetica Neue', Arial, sans-serif" font-size="11" font-weight="bold" fill="#0f172a">09:41</text>
+    <text x="385" y="32" font-family="'Helvetica Neue', Arial, sans-serif" font-size="10.5" font-weight="bold" fill="#0f172a" text-anchor="end">5G 98% 🔋</text>
+
+    <!-- Bill Content Area (Crisp, High-Contrast Typography for Acuity Evaluation) -->
+    <g transform="translate(25, 46)">
+      <!-- Store Header -->
+      <text x="185" y="22" font-family="'Helvetica Neue', Arial, sans-serif" font-size="18" font-weight="900" fill="#0f172a" text-anchor="middle" letter-spacing="1.5">GRAND GALLERIA MALL</text>
+      <text x="185" y="38" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#0284c7" text-anchor="middle" letter-spacing="0.5">PURCHASE RECEIPT &amp; TAX INVOICE</text>
+      <line x1="10" y1="46" x2="360" y2="46" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4,4"/>
+
+      <!-- Meta Info -->
+      <text x="10" y="64" font-family="monospace" font-size="10" font-weight="bold" fill="#334155">DATE: 26-OCT-2026 14:38</text>
+      <text x="360" y="64" font-family="monospace" font-size="10" font-weight="bold" fill="#334155" text-anchor="end">ORDER: #98421</text>
+      <text x="10" y="79" font-family="monospace" font-size="10" font-weight="bold" fill="#0369a1">NEAR TARGET: 0.40m (2.50 D)</text>
+      <text x="360" y="79" font-family="monospace" font-size="10" font-weight="bold" fill="#16a34a" text-anchor="end">PAID VIA APPLE PAY</text>
+      <line x1="10" y1="87" x2="360" y2="87" stroke="#94a3b8" stroke-width="1.5"/>
+
+      <!-- Itemized Table Header -->
+      <text x="10" y="103" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#0f172a">ITEM DESCRIPTION</text>
+      <text x="270" y="103" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#0f172a" text-anchor="end">QTY</text>
+      <text x="360" y="103" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#0f172a" text-anchor="end">PRICE</text>
+      <line x1="10" y1="109" x2="360" y2="109" stroke="#cbd5e1" stroke-width="1"/>
+
+      <!-- Item 1 -->
+      <text x="10" y="128" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#0f172a">Italian Silk Scarf</text>
+      <text x="10" y="141" font-family="Arial, sans-serif" font-size="9.5" fill="#64748b">SKU: #882190 • Navy Blue Edition</text>
+      <text x="270" y="128" font-family="Arial, sans-serif" font-size="11.5" fill="#334155" text-anchor="end">1</text>
+      <text x="360" y="128" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#0f172a" text-anchor="end">$145.00</text>
+
+      <!-- Item 2 -->
+      <text x="10" y="161" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#0f172a">Designer Sunglasses Frame</text>
+      <text x="10" y="174" font-family="Arial, sans-serif" font-size="9.5" fill="#64748b">SKU: #554102 • Polarized Black</text>
+      <text x="270" y="161" font-family="Arial, sans-serif" font-size="11.5" fill="#334155" text-anchor="end">1</text>
+      <text x="360" y="161" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#0f172a" text-anchor="end">$195.00</text>
+
+      <!-- Highlight Total Box -->
+      <rect x="5" y="185" width="360" height="38" rx="6" fill="#0284c7" opacity="0.12"/>
+      <rect x="5" y="185" width="360" height="38" rx="6" fill="none" stroke="#0284c7" stroke-width="2"/>
+      <text x="18" y="210" font-family="Arial, sans-serif" font-size="14" font-weight="900" fill="#0369a1">TOTAL CHARGED</text>
+      <text x="350" y="211" font-family="Arial, sans-serif" font-size="17" font-weight="900" fill="#0369a1" text-anchor="end">$340.00</text>
+
+      <!-- Snellen / Jaeger Near Visual Acuity Reading Strip -->
+      <g transform="translate(5, 235)">
+        <rect x="0" y="0" width="360" height="152" rx="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
+        <text x="180" y="18" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#0f172a" text-anchor="middle" letter-spacing="1">NEAR VISUAL ACUITY TEST CHART (40 cm)</text>
+        <line x1="15" y1="25" x2="345" y2="25" stroke="#94a3b8" stroke-width="1"/>
+
+        <!-- 20/80 (J7) - High legibility -->
+        <text x="15" y="44" font-family="Arial, sans-serif" font-size="13.5" font-weight="bold" fill="#0f172a">[20/80 • J7] 1 2 3 4 5 6 7 8 9</text>
+        <text x="345" y="44" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#475569" text-anchor="end">LARGE PRINT</text>
+
+        <!-- 20/50 (J5) - Newspaper / Menu -->
+        <text x="15" y="68" font-family="Arial, sans-serif" font-size="11.5" font-weight="bold" fill="#0f172a">[20/50 • J5] STORE RETURN POLICY: 30 DAYS</text>
+        <text x="345" y="68" font-family="Arial, sans-serif" font-size="9.5" font-weight="bold" fill="#475569" text-anchor="end">NEWSPAPER</text>
+
+        <!-- 20/30 (J2) - Standard Book / Smartphone -->
+        <text x="15" y="91" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#0f172a">[20/30 • J2] SMARTPHONE MESSAGE BODY TEXT</text>
+        <text x="345" y="91" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#0284c7" text-anchor="end">SMARTPHONE</text>
+
+        <!-- 20/20 (J1) - Fine print / Medicine leaflet -->
+        <text x="15" y="112" font-family="Arial, sans-serif" font-size="8.5" font-weight="bold" fill="#0f172a">[20/20 • J1] RX PHARMACY LABEL &amp; FINE INGREDIENTS</text>
+        <text x="345" y="112" font-family="Arial, sans-serif" font-size="8" font-weight="bold" fill="#16a34a" text-anchor="end">FINE PRINT</text>
+
+        <!-- Acuity note -->
+        <text x="180" y="138" font-family="Arial, sans-serif" font-size="8.5" fill="#64748b" text-anchor="middle">Trifocal reads 20/20 J1 • Monofocal requires +2.5D reading glasses</text>
+      </g>
+
+      <!-- Barcode / QR Section -->
+      <g transform="translate(65, 400)">
+        <!-- Barcode lines -->
+        <rect x="0" y="0" width="3" height="34" fill="#0f172a"/>
+        <rect x="5" y="0" width="1.5" height="34" fill="#0f172a"/>
+        <rect x="9" y="0" width="4.5" height="34" fill="#0f172a"/>
+        <rect x="17" y="0" width="2" height="34" fill="#0f172a"/>
+        <rect x="22" y="0" width="5.5" height="34" fill="#0f172a"/>
+        <rect x="31" y="0" width="2" height="34" fill="#0f172a"/>
+        <rect x="36" y="0" width="3" height="34" fill="#0f172a"/>
+        <rect x="43" y="0" width="1.5" height="34" fill="#0f172a"/>
+        <rect x="48" y="0" width="4.5" height="34" fill="#0f172a"/>
+        <rect x="56" y="0" width="2" height="34" fill="#0f172a"/>
+        <rect x="62" y="0" width="6.5" height="34" fill="#0f172a"/>
+        <rect x="73" y="0" width="2" height="34" fill="#0f172a"/>
+        <rect x="79" y="0" width="3" height="34" fill="#0f172a"/>
+        <rect x="85" y="0" width="4.5" height="34" fill="#0f172a"/>
+        <rect x="94" y="0" width="2" height="34" fill="#0f172a"/>
+        <rect x="100" y="0" width="5.5" height="34" fill="#0f172a"/>
+        <rect x="110" y="0" width="2" height="34" fill="#0f172a"/>
+        <rect x="116" y="0" width="4.5" height="34" fill="#0f172a"/>
+        <rect x="124" y="0" width="1.5" height="34" fill="#0f172a"/>
+        <rect x="130" y="0" width="5.5" height="34" fill="#0f172a"/>
+        <rect x="141" y="0" width="2" height="34" fill="#0f172a"/>
+        <rect x="147" y="0" width="4.5" height="34" fill="#0f172a"/>
+        <rect x="155" y="0" width="3" height="34" fill="#0f172a"/>
+        <rect x="164" y="0" width="5.5" height="34" fill="#0f172a"/>
+        <rect x="175" y="0" width="2" height="34" fill="#0f172a"/>
+        <rect x="181" y="0" width="4.5" height="34" fill="#0f172a"/>
+        <rect x="189" y="0" width="2" height="34" fill="#0f172a"/>
+        <rect x="195" y="0" width="4.5" height="34" fill="#0f172a"/>
+        <rect x="203" y="0" width="3" height="34" fill="#0f172a"/>
+        <rect x="211" y="0" width="5.5" height="34" fill="#0f172a"/>
+        <text x="115" y="48" font-family="monospace" font-size="9.5" font-weight="bold" fill="#334155" text-anchor="middle" letter-spacing="2">0 49102 84920 4</text>
+      </g>
+    </g>
+  </g>
+</svg>

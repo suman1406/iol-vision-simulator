@@ -1,0 +1,78 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="640" viewBox="0 0 960 640">
+  <defs>
+    <linearGradient id="nightSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#020617"/>
+      <stop offset="60%" stop-color="#090d16"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="roadSurface" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="50%" stop-color="#18202c"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Night Sky & Distant Skyline -->
+  <rect x="0" y="0" width="960" height="640" fill="url(#nightSky)"/>
+  
+  <!-- Distant Skyscrapers with illuminated windows -->
+  <rect x="80" y="160" width="70" height="180" fill="#090d16" stroke="#1e293b"/>
+  <rect x="170" y="120" width="90" height="220" fill="#0b1120" stroke="#1e293b"/>
+  <rect x="280" y="180" width="60" height="160" fill="#090d16"/>
+  <rect x="680" y="140" width="80" height="200" fill="#0b1120" stroke="#1e293b"/>
+  <rect x="780" y="170" width="100" height="170" fill="#090d16"/>
+
+  <!-- Distant Lit Windows in Buildings -->
+  <g fill="#fef08a" opacity="0.4">
+    <rect x="185" y="135" width="4" height="6"/><rect x="195" y="135" width="4" height="6"/><rect x="215" y="135" width="4" height="6"/>
+    <rect x="185" y="150" width="4" height="6"/><rect x="205" y="150" width="4" height="6"/><rect x="235" y="150" width="4" height="6"/>
+    <rect x="195" y="170" width="4" height="6"/><rect x="225" y="170" width="4" height="6"/>
+    <rect x="700" y="160" width="4" height="6"/><rect x="720" y="160" width="4" height="6"/>
+    <rect x="710" y="180" width="4" height="6"/><rect x="730" y="180" width="4" height="6"/>
+  </g>
+
+  <!-- Overhead Highway Gantry & Signs at 15.0 m -->
+  <rect x="140" y="80" width="680" height="14" fill="#334155" stroke="#475569"/>
+  <line x1="150" y1="94" x2="150" y2="340" stroke="#475569" stroke-width="8"/>
+  <line x1="810" y1="94" x2="810" y2="340" stroke="#475569" stroke-width="8"/>
+
+  <!-- Green Highway Sign 1 -->
+  <rect x="220" y="30" width="240" height="85" rx="6" fill="#14532d" stroke="#f8fafc" stroke-width="3"/>
+  <text x="340" y="55" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="middle">EXIT 14A • DOWNTOWN</text>
+  <text x="340" y="75" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#86efac" text-anchor="middle">METRO AIRPORT  2 MI</text>
+  <text x="430" y="98" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#ffffff" text-anchor="middle">➔</text>
+
+  <!-- Green Highway Sign 2 -->
+  <rect x="490" y="30" width="220" height="85" rx="6" fill="#14532d" stroke="#f8fafc" stroke-width="3"/>
+  <text x="600" y="55" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="middle">I-90 WEST • CITY CENTER</text>
+  <text x="600" y="75" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#86efac" text-anchor="middle">SPEED LIMIT 55 MPH</text>
+  <text x="600" y="98" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="middle">KEEP LEFT</text>
+
+  <!-- Asphalt Highway Road Surface -->
+  <polygon points="120,340 840,340 960,640 0,640" fill="url(#roadSurface)"/>
+
+  <!-- Road Shoulder & Guard Rails -->
+  <line x1="120" y1="340" x2="0" y2="640" stroke="#64748b" stroke-width="3"/>
+  <line x1="840" y1="340" x2="960" y2="640" stroke="#64748b" stroke-width="3"/>
+
+  <!-- Dashed White Lane Markings -->
+  <line x1="360" y1="340" x2="280" y2="640" stroke="#ffffff" stroke-width="4" stroke-dasharray="25,20"/>
+  <line x1="480" y1="340" x2="480" y2="640" stroke="#eab308" stroke-width="5"/> <!-- Center double yellow -->
+  <line x1="486" y1="340" x2="486" y2="640" stroke="#eab308" stroke-width="5"/>
+  <line x1="600" y1="340" x2="680" y2="640" stroke="#ffffff" stroke-width="4" stroke-dasharray="25,20"/>
+
+  <!-- Distant Oncoming SUV at 25m -->
+  <rect x="420" y="325" width="44" height="24" rx="4" fill="#0f172a" stroke="#334155"/>
+  <!-- Taillights of Leading Car at 18m -->
+  <rect x="550" y="332" width="38" height="20" rx="3" fill="#0f172a"/>
+  <circle cx="556" cy="342" r="4" fill="#dc2626"/>
+  <circle cx="582" cy="342" r="4" fill="#dc2626"/>
+
+  <!-- Street Lantern Poles along highway -->
+  <line x1="170" y1="180" x2="170" y2="340" stroke="#64748b" stroke-width="3"/>
+  <path d="M 170 180 Q 185 160 205 165" stroke="#64748b" stroke-width="3" fill="none"/>
+  
+  <line x1="790" y1="180" x2="790" y2="340" stroke="#64748b" stroke-width="3"/>
+  <path d="M 790 180 Q 775 160 755 165" stroke="#64748b" stroke-width="3" fill="none"/>
+</svg>

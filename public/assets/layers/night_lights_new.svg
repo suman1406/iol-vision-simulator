@@ -1,0 +1,20 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="640" viewBox="0 0 960 640">
+  <!-- High intensity oncoming xenon headlights (cores clipped white for HDR expansion) -->
+  <circle cx="430" cy="336" r="6" fill="#ffffff"/>
+  <circle cx="454" cy="336" r="6" fill="#ffffff"/>
+  
+  <!-- Leading car taillights -->
+  <circle cx="556" cy="342" r="5" fill="#ff4d4d"/>
+  <circle cx="582" cy="342" r="5" fill="#ff4d4d"/>
+
+  <!-- Overhead streetlamp cores -->
+  <circle cx="205" cy="165" r="7" fill="#ffffff"/>
+  <circle cx="755" cy="165" r="7" fill="#ffffff"/>
+
+  <!-- Distant streetlights along boulevard -->
+  <circle cx="280" cy="280" r="3" fill="#ffffff"/>
+  <circle cx="340" cy="300" r="3" fill="#ffffff"/>
+  <circle cx="680" cy="300" r="3" fill="#ffffff"/>
+  <circle cx="730" cy="280" r="3" fill="#ffffff"/>
+</svg>

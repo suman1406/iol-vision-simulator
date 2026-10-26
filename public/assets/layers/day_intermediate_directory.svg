@@ -1,0 +1,78 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="640" viewBox="0 0 960 640">
+  <defs>
+    <linearGradient id="kioskBody" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="50%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="screenGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="10%" stop-color="#0369a1"/>
+      <stop offset="100%" stop-color="#082f49"/>
+    </linearGradient>
+    <linearGradient id="glassRailing" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f8fafc" stop-opacity="0.5"/>
+      <stop offset="50%" stop-color="#94a3b8" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#cbd5e1" stop-opacity="0.6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Clear glass balustrade in front (right and center) -->
+  <path d="M 440 380 L 960 410 L 960 640 L 440 640 Z" fill="url(#glassRailing)"/>
+  <!-- Polished Steel Railing Bar -->
+  <line x1="435" y1="380" x2="960" y2="410" stroke="#f1f5f9" stroke-width="12" stroke-linecap="round"/>
+  <line x1="435" y1="382" x2="960" y2="412" stroke="#475569" stroke-width="4"/>
+
+  <!-- Left Side: Interactive Mall Directory Totem at 1.0 m -->
+  <!-- Shadow on floor -->
+  <ellipse cx="230" cy="625" rx="140" ry="18" fill="#0f172a" opacity="0.45"/>
+
+  <!-- Kiosk Pillar Stand -->
+  <rect x="110" y="240" width="240" height="380" rx="12" fill="url(#kioskBody)" stroke="#64748b" stroke-width="3"/>
+  <rect x="120" y="250" width="220" height="340" rx="8" fill="url(#screenGrad)" stroke="#38bdf8" stroke-width="2"/>
+
+  <!-- Kiosk Header -->
+  <rect x="120" y="250" width="220" height="42" rx="8" fill="#0284c7"/>
+  <text x="230" y="278" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#ffffff" text-anchor="middle" letter-spacing="2">MALL DIRECTORY</text>
+
+  <!-- Directory Search Bar -->
+  <rect x="130" y="300" width="200" height="24" rx="4" fill="#ffffff" opacity="0.95"/>
+  <text x="140" y="316" font-family="Arial, sans-serif" font-size="11" fill="#64748b">Search stores or brands...</text>
+
+  <!-- Category Entries with Crisp Icons & Text -->
+  <!-- Level 3 -->
+  <g transform="translate(130, 335)">
+    <rect x="0" y="0" width="200" height="40" rx="4" fill="#0c4a6e" stroke="#0284c7" stroke-width="1"/>
+    <text x="10" y="18" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#38bdf8">L3 • Fine Dining &amp; Cinema</text>
+    <text x="10" y="32" font-family="Arial, sans-serif" font-size="10" fill="#bae6fd">Bistro, IMAX Theater, Rooftop Bar</text>
+    <text x="185" y="25" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#38bdf8" text-anchor="end">➔</text>
+  </g>
+
+  <!-- Level 2 -->
+  <g transform="translate(130, 385)">
+    <rect x="0" y="0" width="200" height="40" rx="4" fill="#0c4a6e" stroke="#0284c7" stroke-width="1"/>
+    <text x="10" y="18" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#38bdf8">L2 • High Fashion &amp; Beauty</text>
+    <text x="10" y="32" font-family="Arial, sans-serif" font-size="10" fill="#bae6fd">Designer Apparel, Cosmetics, Spa</text>
+    <text x="185" y="25" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#38bdf8" text-anchor="end">➔</text>
+  </g>
+
+  <!-- Level 1 -->
+  <g transform="translate(130, 435)">
+    <rect x="0" y="0" width="200" height="40" rx="4" fill="#0c4a6e" stroke="#0284c7" stroke-width="1"/>
+    <text x="10" y="18" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#38bdf8">L1 • Jewelry &amp; Electronics</text>
+    <text x="10" y="32" font-family="Arial, sans-serif" font-size="10" fill="#bae6fd">Watches, Tech Lounge, Atrium Cafe</text>
+    <text x="185" y="25" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#38bdf8" text-anchor="end">➔</text>
+  </g>
+
+  <!-- Services & Amenities -->
+  <g transform="translate(130, 485)">
+    <rect x="0" y="0" width="200" height="38" rx="4" fill="#075985"/>
+    <text x="10" y="16" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#ffffff">Services &amp; Information</text>
+    <text x="10" y="30" font-family="Arial, sans-serif" font-size="9" fill="#e0f2fe">Restrooms, ATM, Guest Concierge</text>
+  </g>
+
+  <!-- Footer Info on Kiosk -->
+  <text x="230" y="542" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#e0f2fe" text-anchor="middle">Distance to Reader: 1.0 m</text>
+  <text x="230" y="556" font-family="Arial, sans-serif" font-size="8.5" fill="#bae6fd" text-anchor="middle">Intermediate Focus • Touch Screen to Navigate</text>
+</svg>

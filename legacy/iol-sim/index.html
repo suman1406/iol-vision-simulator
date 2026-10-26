@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IOL Vision Simulator</title>
+<style>
+  /* Layout: header and footer take their natural height; the image fills whatever is left, so the whole
+     screen (controls, image, disclaimer) fits on a tablet in either orientation without scrolling. */
+  body{margin:0;font:16px system-ui,sans-serif;background:#12151a;color:#e8ecf1;display:flex;flex-direction:column;height:100vh;height:100dvh}
+  header{flex:none;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:end;padding:10px 20px;background:#1b2028}
+  label{display:flex;flex-direction:column;font-size:12px;color:#9aa6b5;gap:4px;flex:1 1 220px;max-width:340px}
+  select{font-size:16px;padding:8px;min-height:44px;width:100%;background:#0f1216;color:inherit;border:1px solid #3a4452;border-radius:6px}
+  button{font-size:15px;padding:9px 14px;min-height:44px;background:#2d3846;color:inherit;border:0;border-radius:6px;cursor:pointer}
+  .spacer{flex:1 1 0}
+  .badge{font-size:13px;padding:5px 10px;border-radius:12px;background:#333;max-width:280px;align-self:center}
+  .badge.partial{background:#6b5a14}.badge.insufficient{background:#5a2a2a}.badge.available{background:#1e5a34}
+  main{flex:1 1 auto;min-height:240px;position:relative;display:flex;flex-direction:column;padding:10px 20px 4px}
+  canvas{flex:1 1 auto;min-height:0;width:100%;height:100%;object-fit:contain;background:#000;border-radius:6px}
+  #note{position:absolute;left:36px;top:26px;background:#000a;padding:8px 12px;border-radius:6px;font-size:14px;max-width:60%}
+  #credit{flex:none;padding-top:4px}
+  footer{flex:none;padding:4px 20px 12px;font-size:13px;color:#9aa6b5}
+  dialog{width:min(640px,calc(100vw - 32px));max-height:85vh;max-height:85dvh;overflow:auto;padding:0 16px 16px;background:#1b2028;color:inherit;border:1px solid #3a4452;border-radius:10px}
+  .dlg-head{position:sticky;top:0;z-index:1;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 0;background:#1b2028;border-bottom:1px solid #3a4452}
+  dialog a{color:#8ec5f0;overflow-wrap:anywhere} .ref{border-top:1px solid #3a4452;padding-top:8px;margin-top:8px;font-size:14px}
+  table{border-collapse:collapse;font-size:13px} td,th{border:1px solid #3a4452;padding:2px 8px;text-align:right}
+  .scroll{overflow-x:auto;max-width:100%} table.effects td,table.effects th{text-align:left;vertical-align:top}
+  .st-modelled{color:#9fd8a8} .st-not-modelled{color:#e6c46a} .st-not-rendered{color:#e89a9a}
+  dialog::backdrop{background:#000a} .small{font-size:12px;color:#9aa6b5}
+</style></head><body>
+<header>
+  <label>IOL / lens profile<select id="lens"></select></label>
+  <label>Environment<select id="env"></select></label>
+  <span id="status" class="badge"></span>
+  <span class="spacer"></span>
+  <button id="open-method">Methodology &amp; evidence</button>
+</header>
+<main><canvas id="view"></canvas><div id="note"></div><div id="credit" class="small"></div></main>
+<footer>Illustrative visual simulation only. Not a visual-acuity test or a clinically validated prediction of an individual's postoperative vision. Actual outcomes vary. Lens-specific effects are shown only to the extent supported by available evidence.</footer>
+<dialog id="method"><div class="dlg-head"><b>Methodology &amp; evidence</b><button id="close-method">Close</button></div><div id="method-body"></div></dialog>
+<script src="data/defocusCurves.js"></script>
+<script src="data/evidence.js"></script>
+<script src="data/lensProfiles.js"></script>
+<script src="data/vivityPowerProfile.js"></script>
+<script src="data/opticalModels.js"></script>
+<script src="optics.js"></script>
+<script src="render.js"></script>
+<script src="scene.js"></script>
+<script src="app.js"></script>
+</body></html>
