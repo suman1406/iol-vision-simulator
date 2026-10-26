@@ -75,9 +75,9 @@ export const ControlsBar: React.FC<ControlsBarProps> = ({
                 )}
                 <span>
                   {env.id === 'day_photo_drive'
-                    ? '☀️ Daytime Photo (Street 10m, Dash 0.85m, Phone 0.40m)'
+                    ? '☀️ Daytime Driver POV (Street 10m, Cockpit 0.85m, Phone 0.40m)'
                     : env.id === 'night_photo_drive'
-                    ? '🌃 Night Driving (Street 15m, Cockpit 0.85m, Phone 0.40m)'
+                    ? '🌃 Nighttime Driver POV (Street 15m, Cockpit 0.85m, Phone 0.40m)'
                     : env.id === 'day_mall'
                     ? '🏬 Daytime Mall Atrium'
                     : env.name}
