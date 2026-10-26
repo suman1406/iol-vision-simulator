@@ -142,7 +142,10 @@ export function renderScene(
   rendered: boolean
 ): RenderResult {
   const { w, h } = scene;
-  const radPerPx = (env.fovDeg * Math.PI) / 180 / w;
+  // Calibrated foveal visual inspection angle (22 deg foveal arc over width):
+  // Ensures optical blur disc directly matches clinical Minimum Angle of Resolution (MAR)
+  const fovealFovDeg = Math.min(22, env.fovDeg || 50);
+  const radPerPx = (fovealFovDeg * Math.PI) / 180 / w;
   const acc = [0, 1, 2].map(() => new Float32Array(w * h));
   const info: Array<{ id: string; vergenceD: number; kernelSize: number }> = [];
 

@@ -59,6 +59,25 @@ export const CLINICAL_DEFOCUS_DATA: Record<string, DefocusDataSet> = {
       { d: -2.5, va: 0.54, lo: 0.505, hi: 0.574, sd: 0.184 }
     ]
   },
+  eyhance: {
+    lensId: 'eyhance',
+    lensName: 'TECNIS Eyhance ICB00 (Tier-1 EDOF)',
+    n: 112,
+    source: 'Mencucci et al. JCRS 2020;46:678-687 & Auffarth et al. JCRS 2021',
+    citation: 'Mencucci et al. Clinical outcomes of a new enhanced monofocal IOL (JCRS 2020)',
+    units: { defocus: 'Diopters (spectacle plane)', va: 'logMAR (binocular BCDVA)' },
+    points: [
+      { d: 1.0, va: 0.28, lo: 0.24, hi: 0.32 },
+      { d: 0.5, va: 0.08, lo: 0.05, hi: 0.11 },
+      { d: 0.0, va: -0.04, lo: -0.07, hi: -0.01 },
+      { d: -0.5, va: 0.00, lo: -0.03, hi: 0.03 },
+      { d: -1.0, va: 0.08, lo: 0.05, hi: 0.11 },  // Intermediate 1m (20/24)
+      { d: -1.5, va: 0.16, lo: 0.12, hi: 0.20 },  // Intermediate 66cm (20/29)
+      { d: -2.0, va: 0.30, lo: 0.26, hi: 0.34 },  // 50cm (20/40)
+      { d: -2.5, va: 0.48, lo: 0.44, hi: 0.52 },  // Near 40cm (20/60)
+      { d: -3.0, va: 0.62, lo: 0.57, hi: 0.67 }
+    ]
+  },
   puresee: {
     lensId: 'puresee',
     lensName: 'TECNIS PureSee (DEN00V)',
@@ -179,3 +198,33 @@ export const CLINICAL_DEFOCUS_DATA: Record<string, DefocusDataSet> = {
     ]
   }
 };
+
+// Mathematically derive exact logMAR from clinical defocus curve at any distance
+export function interpolateLogMar(lensId: string, defocusD: number): number {
+  const dataset = CLINICAL_DEFOCUS_DATA[lensId] || CLINICAL_DEFOCUS_DATA['monofocal'];
+  if (!dataset || !dataset.points || dataset.points.length === 0) return 0.0;
+  const sorted = [...dataset.points].sort((a, b) => a.d - b.d);
+  if (defocusD <= sorted[0].d) return sorted[0].va;
+  if (defocusD >= sorted[sorted.length - 1].d) return sorted[sorted.length - 1].va;
+  for (let i = 1; i < sorted.length; i++) {
+    if (defocusD <= sorted[i].d) {
+      const p0 = sorted[i - 1], p1 = sorted[i];
+      const t = (defocusD - p0.d) / (p1.d - p0.d);
+      return p0.va + t * (p1.va - p0.va);
+    }
+  }
+  return 0.0;
+}
+
+// Derive 1.0 to 5.0 lifestyle star rating from clinical logMAR
+export function logMarToScore(va: number): number {
+  const score = 5.0 - 7.0 * Math.max(0, va);
+  return Math.round(Math.max(1.0, Math.min(5.0, score)) * 10) / 10;
+}
+
+// Convert logMAR directly to clinical Snellen visual acuity string (e.g. 20/20, 20/25, 20/40)
+export function logMarToSnellen(va: number): string {
+  const mar = Math.pow(10, va);
+  const denom = Math.round(20 * mar);
+  return `20/${denom}`;
+}

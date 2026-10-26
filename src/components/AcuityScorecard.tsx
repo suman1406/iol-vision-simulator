@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { LensProfile } from '../lib/data/lensProfiles';
-import { CheckCircle2, AlertTriangle, Sparkles, Glasses, Car, Monitor, Compass } from 'lucide-react';
+import { Sparkles, Glasses, Car, Monitor, Compass } from 'lucide-react';
 
 interface AcuityScorecardProps {
   lens: LensProfile;
@@ -11,27 +11,34 @@ interface AcuityScorecardProps {
 export const AcuityScorecard: React.FC<AcuityScorecardProps> = ({ lens }) => {
   const { ratings } = lens;
 
-  const renderStars = (score: number, max = 5) => {
+  const renderStarsWithSnellen = (score: number, snellen?: string, max = 5) => {
     const pct = Math.min(100, (score / max) * 100);
     return (
-      <div className="flex items-center gap-1.5 w-28">
-        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200">
-          <div
-            className={`h-full rounded-full transition-all duration-300 ${
-              score >= 4.5
-                ? 'bg-emerald-500'
-                : score >= 3.0
-                ? 'bg-sky-500'
-                : score >= 2.0
-                ? 'bg-amber-500'
-                : 'bg-rose-500'
-            }`}
-            style={{ width: `${pct}%` }}
-          />
+      <div className="flex items-center gap-2">
+        {snellen && (
+          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-800 font-mono border border-slate-200/80 shadow-2xs">
+            {snellen}
+          </span>
+        )}
+        <div className="flex items-center gap-1.5 w-20">
+          <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200">
+            <div
+              className={`h-full rounded-full transition-all duration-300 ${
+                score >= 4.5
+                  ? 'bg-emerald-500'
+                  : score >= 3.0
+                  ? 'bg-sky-500'
+                  : score >= 2.0
+                  ? 'bg-amber-500'
+                  : 'bg-rose-500'
+              }`}
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+          <span className="text-[10px] font-bold text-slate-700 font-mono shrink-0">
+            {score.toFixed(1)}
+          </span>
         </div>
-        <span className="text-[10px] font-bold text-slate-700 font-mono shrink-0">
-          {score.toFixed(1)}
-        </span>
       </div>
     );
   };
@@ -58,15 +65,15 @@ export const AcuityScorecard: React.FC<AcuityScorecardProps> = ({ lens }) => {
             <Compass className="w-3.5 h-3.5 text-sky-600" />
             Distance (&gt;5m):
           </span>
-          {renderStars(ratings.distance)}
+          {renderStarsWithSnellen(ratings.distance, ratings.snellenDistance)}
         </div>
 
         <div className="p-2 bg-slate-50/80 rounded-xl border border-slate-200/60 flex items-center justify-between">
           <span className="flex items-center gap-1.5 text-slate-700 font-semibold text-[11px]">
             <Monitor className="w-3.5 h-3.5 text-teal-600" />
-            Intermediate (1m/60cm):
+            Intermediate (66cm-1m):
           </span>
-          {renderStars(ratings.intermediate)}
+          {renderStarsWithSnellen(ratings.intermediate, ratings.snellenIntermediate)}
         </div>
 
         <div className="p-2 bg-slate-50/80 rounded-xl border border-slate-200/60 flex items-center justify-between">
@@ -74,7 +81,7 @@ export const AcuityScorecard: React.FC<AcuityScorecardProps> = ({ lens }) => {
             <Glasses className="w-3.5 h-3.5 text-indigo-600" />
             Near Reading (40cm):
           </span>
-          {renderStars(ratings.near)}
+          {renderStarsWithSnellen(ratings.near, ratings.snellenNear)}
         </div>
 
         <div className="p-2 bg-slate-50/80 rounded-xl border border-slate-200/60 flex items-center justify-between">

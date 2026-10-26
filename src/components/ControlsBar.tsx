@@ -25,6 +25,8 @@ export const ControlsBar: React.FC<ControlsBarProps> = ({
     switch (color) {
       case 'teal':
         return 'bg-teal-600 text-white border-teal-600 shadow-md ring-2 ring-teal-500/20';
+      case 'cyan':
+        return 'bg-cyan-600 text-white border-cyan-600 shadow-md ring-2 ring-cyan-500/20';
       case 'emerald':
         return 'bg-emerald-600 text-white border-emerald-600 shadow-md ring-2 ring-emerald-500/20';
       case 'indigo':
@@ -48,7 +50,7 @@ export const ControlsBar: React.FC<ControlsBarProps> = ({
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2">
         <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
           <Sun className="w-3.5 h-3.5 text-amber-500" />
-          <span>Viewing Scene:</span>
+          <span>Viewing Scene (Far, Int &amp; Near):</span>
         </div>
 
         <div className="flex flex-wrap items-center gap-1.5">
@@ -72,14 +74,12 @@ export const ControlsBar: React.FC<ControlsBarProps> = ({
                   <Sun className="w-3 h-3 text-amber-200" />
                 )}
                 <span>
-                  {env.id === 'day_mall'
-                    ? '🏬 Daytime Mall (with Near Phone)'
-                    : env.id === 'night_drive'
-                    ? '🛣️ Night Highway (Dashboard & Glare)'
-                    : env.id === 'day_taxi_classic'
-                    ? '📷 Photo: Daytime Street & Taxi'
-                    : env.id === 'night_crete_classic'
-                    ? '📷 Photo: Night Street Driving'
+                  {env.id === 'day_photo_drive'
+                    ? '☀️ Daytime Photo (Street 10m, Dash 0.85m, Phone 0.40m)'
+                    : env.id === 'night_photo_drive'
+                    ? '🌃 Night Driving (Street 15m, Cockpit 0.85m, Phone 0.40m)'
+                    : env.id === 'day_mall'
+                    ? '🏬 Daytime Mall Atrium'
                     : env.name}
                 </span>
               </button>
@@ -100,7 +100,7 @@ export const ControlsBar: React.FC<ControlsBarProps> = ({
           </span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-1.5">
+        <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-1.5">
           {LENS_PROFILES.map((lens) => {
             const isSelected = lens.id === selectedLens.id;
             return (
@@ -113,13 +113,13 @@ export const ControlsBar: React.FC<ControlsBarProps> = ({
                 )}`}
               >
                 <div className="flex items-center gap-1 w-full justify-center">
-                  <span className="text-xs font-bold truncate max-w-[110px] leading-tight">
+                  <span className="text-[11px] font-bold truncate max-w-[105px] leading-tight">
                     {lens.shortName}
                   </span>
                   {isSelected && <Check className="w-3 h-3 shrink-0" />}
                 </div>
                 <span
-                  className={`text-[9.5px] font-medium mt-0.5 px-1.5 py-0.2 rounded-full truncate max-w-[95px] ${
+                  className={`text-[9px] font-medium mt-0.5 px-1.5 py-0.2 rounded-full truncate max-w-[90px] ${
                     isSelected
                       ? 'bg-black/20 text-white/90'
                       : 'bg-slate-100 text-slate-500'

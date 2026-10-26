@@ -65,7 +65,7 @@ export const OPTICAL_MODELS: Record<string, OpticalModel> = {
   },
   monofocal: {
     kind: 'clinical-benchmark',
-    label: '1. Aspheric Monofocal IOL (Alcon Clareon / AcrySof SN60WF)',
+    label: '1. Standard Aspheric Monofocal (Alcon Clareon SY60WF / AcrySof SN60WF)',
     foci: [{ addD: 0, weight: 1 }],
     assumptions: [
       'Diffraction-limited optical reference focused at optical infinity (0.0 D add)',
@@ -76,6 +76,25 @@ export const OPTICAL_MODELS: Record<string, OpticalModel> = {
       modelVersion: '1.2.0',
       date: '2026-10-26',
       derivedFrom: 'Alcon SN60WF FDA SSED P930014 & Carson et al. JCRS 2016',
+    },
+  },
+  eyhance: {
+    kind: 'peer-reviewed-bench',
+    label: '2. Plain Tier-1 EDOF / Enhanced Monofocal (Johnson & Johnson TECNIS Eyhance ICB00)',
+    foci: [
+      { addD: 0, weight: 0.72 },        // Primary distance focus (0.0 D)
+      { addD: 0.85, weight: 0.28 },     // Anterior continuous progressive power (+0.85 D intermediate)
+    ],
+    assumptions: [
+      'Refractive power progression on anterior aspheric surface providing continuous intermediate extension (+0.85 D)',
+      'Clinical trial data from Mencucci et al. JCRS 2020 and Auffarth et al. JCRS 2021',
+      'Zero diffractive rings or dysphotopsia (identical night profile to standard monofocal)',
+      'Delivers distance 20/18 and intermediate 20/29 (J3); reading glasses needed for fine near tasks',
+    ],
+    version: {
+      modelVersion: '1.0.0',
+      date: '2026-10-26',
+      derivedFrom: 'Mencucci et al. JCRS 2020;46:678-687 & Auffarth et al. JCRS 2021 (Q1)',
     },
   },
   edof: {

@@ -189,17 +189,27 @@ export function psfForLayer(opts: {
     wsum += effectiveWeight;
   }
 
-  // Bin from dA to radPerPx
-  const half = Math.ceil((N * dA / 2) / radPerPx);
+  // Bin from dA to radPerPx using smooth bilinear splatting (preserves foveal MAR subpixel fidelity)
+  const half = Math.max(1, Math.ceil((N * dA / 2) / radPerPx));
   const size = 2 * half + 1;
   const k = new Float64Array(size * size);
 
   for (let y = 0; y < N; y++) {
     for (let x = 0; x < N; x++) {
-      const bx = Math.round((x - N / 2) * dA / radPerPx) + half;
-      const by = Math.round((y - N / 2) * dA / radPerPx) + half;
-      if (bx >= 0 && by >= 0 && bx < size && by < size) {
-        k[by * size + bx] += acc[y * N + x];
+      const v = acc[y * N + x];
+      if (v === 0) continue;
+      const fx = (x - N / 2) * (dA / radPerPx) + half;
+      const fy = (y - N / 2) * (dA / radPerPx) + half;
+      const x0 = Math.floor(fx);
+      const y0 = Math.floor(fy);
+      const wx = fx - x0;
+      const wy = fy - y0;
+
+      if (x0 >= 0 && x0 < size && y0 >= 0 && y0 < size) {
+        k[y0 * size + x0] += v * (1 - wx) * (1 - wy);
+        if (x0 + 1 < size) k[y0 * size + (x0 + 1)] += v * wx * (1 - wy);
+        if (y0 + 1 < size) k[(y0 + 1) * size + x0] += v * (1 - wx) * wy;
+        if (x0 + 1 < size && y0 + 1 < size) k[(y0 + 1) * size + (x0 + 1)] += v * wx * wy;
       }
     }
   }
