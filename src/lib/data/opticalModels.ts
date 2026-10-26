@@ -114,7 +114,11 @@ export const OPTICAL_MODELS: Record<string, OpticalModel> = {
     },
     pupilToIolScale: Math.sqrt(2.2 / 1.7),
     focusPerPupil: true,
-    foci: [{ addD: 0, weight: 1 }],
+    foci: [
+      { addD: 0, weight: 0.58 },        // Distance focus peak (0.0 D)
+      { addD: 1.35, weight: 0.26 },     // Intermediate sustained plateau (66 cm - 1 m)
+      { addD: 2.15, weight: 0.16 },     // Secondary near functional lobe (Schmid 2024 Fig 3: 0.27 logMAR)
+    ],
     assumptions: [
       'Measured radial Optical Path Difference (OPD) from Schmid & Borkenstein 2024 (OptiSpheric IOL PRO 2, 546 nm)',
       'Wavefront preserved with high spatial fidelity across the central zone (reproduces bench through-focus MTF peak 0.38 at 3 mm and secondary lobe at +2.1 D)',
@@ -137,7 +141,11 @@ export const OPTICAL_MODELS: Record<string, OpticalModel> = {
     },
     pupilToIolScale: Math.sqrt(2.2 / 1.7),
     focusPerPupil: true,
-    foci: [{ addD: 0, weight: 1 }],
+    foci: [
+      { addD: 0, weight: 0.64 },        // Distance focus peak (0.0 D)
+      { addD: 1.40, weight: 0.25 },     // Intermediate plateau (60-70 cm, FDA SSED 0.066 logMAR)
+      { addD: 2.00, weight: 0.11 },     // Functional near extension (40-50 cm, FDA SSED 0.366 logMAR)
+    ],
     assumptions: [
       'Power profile of +20 D lens measured on NIMO TR1504 phase-shifting Schlieren instrument at 546 nm (mean of 10 measurements, SD ≤ 0.03 D)',
       'Wavefront computed by radial integration of measured optical power profile',

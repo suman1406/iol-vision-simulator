@@ -5,7 +5,7 @@ import { LensProfile, LENS_PROFILES } from '../lib/data/lensProfiles';
 import { Environment } from '../lib/data/environments';
 import { OPTICAL_MODELS } from '../lib/data/opticalModels';
 import { renderScene, SceneLayer, RenderResult } from '../lib/optics/renderer';
-import { ZoomIn, Maximize2, RefreshCw, Eye, ArrowLeftRight } from 'lucide-react';
+import { ZoomIn, Maximize2, RefreshCw, Eye, ArrowLeftRight, Camera } from 'lucide-react';
 
 interface SimulatorViewProps {
   selectedLens: LensProfile;
@@ -231,6 +231,22 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
               🏢 Far (10m)
             </button>
           </div>
+
+          <button
+            onClick={() => {
+              const canvas = canvasRef.current;
+              if (!canvas) return;
+              const link = document.createElement('a');
+              link.download = `IOL_Simulation_${activeDisplayLens.id}_${selectedEnv.id}.png`;
+              link.href = canvas.toDataURL('image/png');
+              link.click();
+            }}
+            title="Download or save simulation view as a high-resolution Photo (PNG)"
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 shadow-2xs transition"
+          >
+            <Camera className="w-3.5 h-3.5 text-sky-600" />
+            <span>Save Photo</span>
+          </button>
         </div>
       </div>
 

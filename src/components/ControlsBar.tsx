@@ -73,9 +73,13 @@ export const ControlsBar: React.FC<ControlsBarProps> = ({
                 )}
                 <span>
                   {env.id === 'day_mall'
-                    ? 'Daytime Mall (Near Phone/Bill)'
+                    ? '🏬 Daytime Mall (with Near Phone)'
                     : env.id === 'night_drive'
-                    ? 'Night Driving (Dashboard & Headlights)'
+                    ? '🛣️ Night Highway (Dashboard & Glare)'
+                    : env.id === 'day_taxi_classic'
+                    ? '📷 Photo: Daytime Street & Taxi'
+                    : env.id === 'night_crete_classic'
+                    ? '📷 Photo: Night Street Driving'
                     : env.name}
                 </span>
               </button>
@@ -96,7 +100,7 @@ export const ControlsBar: React.FC<ControlsBarProps> = ({
           </span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-1.5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-1.5">
           {LENS_PROFILES.map((lens) => {
             const isSelected = lens.id === selectedLens.id;
             return (
