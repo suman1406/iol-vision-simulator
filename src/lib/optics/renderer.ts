@@ -159,10 +159,12 @@ export function renderScene(
     const vergenceD = 1 / layer.distanceM;
 
     if (rendered && effectiveLens) {
-      const adds = (effectiveLens.foci || [{ addD: 0 }]).map((f) =>
-        Math.abs(vergenceD - f.addD + (effectiveLens?.focusOffsetD || 0))
-      );
-      const extentRad = Math.min(0.08, env.pupilMm * 1e-3 * Math.max(...adds, 0.5) * 1.3 + 0.004);
+      const adds = effectiveLens.kind === 'natural-reference'
+        ? [0]
+        : (effectiveLens.foci || [{ addD: 0 }]).map((f) =>
+            Math.abs(vergenceD - f.addD + (effectiveLens?.focusOffsetD || 0))
+          );
+      const extentRad = Math.min(0.045, env.pupilMm * 1e-3 * Math.max(...adds, 0.5) * 1.3 + 0.004);
       const psf = psfForLayer({
         pupilMm: env.pupilMm,
         lambdaUm: env.lambdaUm,

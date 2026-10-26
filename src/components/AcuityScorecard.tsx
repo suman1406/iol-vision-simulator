@@ -72,7 +72,7 @@ export const AcuityScorecard: React.FC<AcuityScorecardProps> = ({ lens }) => {
         <div className="p-2 bg-slate-50/80 rounded-xl border border-slate-200/60 flex items-center justify-between">
           <span className="flex items-center gap-1.5 text-slate-700 font-semibold text-[11px]">
             <Glasses className="w-3.5 h-3.5 text-indigo-600" />
-            Near Reading (38cm):
+            Near Reading (40cm):
           </span>
           {renderStars(ratings.near)}
         </div>
