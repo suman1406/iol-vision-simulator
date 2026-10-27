@@ -341,14 +341,13 @@ export function renderDepthBlendedScene(
       const normX = x / w;
       const idx = y * w + x;
 
-      // Calibrated depth geometries for Daytime (Bangalore Toyota) and Nighttime POV scenes:
-      const isDay = env.category === 'day';
-
+      // Calibrated depth geometries for Daytime & Nighttime Toyota Driver POV scenes:
+      // Both day and night share identical POV geometry: Far windshield ahead, Cockpit at 0.85m, Phone at 0.40m.
       // 1. Smartphone & hand region (Near: 0.40m)
-      const phoneCenterX = isDay ? 0.865 : 0.635;
-      const phoneCenterY = isDay ? 0.65 : 0.62;
-      const phoneHalfW = isDay ? 0.095 : 0.115;
-      const phoneHalfH = isDay ? 0.30 : 0.28;
+      const phoneCenterX = 0.865;
+      const phoneCenterY = 0.65;
+      const phoneHalfW = 0.095;
+      const phoneHalfH = 0.30;
       const phoneBlendRadius = 0.04;
 
       const phoneDistX = Math.max(0, Math.abs(normX - phoneCenterX) - phoneHalfW);
@@ -356,10 +355,8 @@ export function renderDepthBlendedScene(
       const phoneDist = Math.hypot(phoneDistX / phoneBlendRadius, phoneDistY / phoneBlendRadius);
       const wNear = Math.max(0, Math.min(1, 1 - phoneDist));
 
-      // 2. Natural curved windshield horizon line (Far: 10m / 15m)
-      const horizon = isDay
-        ? 0.33 + 0.04 * Math.sin(normX * Math.PI)
-        : 0.44 + 0.07 * Math.sin(normX * Math.PI);
+      // 2. Natural curved windshield horizon line (Far: 10m)
+      const horizon = 0.34 + 0.04 * Math.sin(normX * Math.PI);
       const farDist = (horizon - normY) / 0.04;
       const rawFar = Math.max(0, Math.min(1, farDist));
       const wFar = rawFar * (1 - wNear);
