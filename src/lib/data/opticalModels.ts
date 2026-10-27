@@ -35,16 +35,16 @@ const VP = VIVITY_POWER_PROFILE;
 export const OPTICAL_MODELS: Record<string, OpticalModel> = {
   natural_eye: {
     kind: 'natural-reference',
-    label: '0. Natural Accommodating Eye (20/20 Reference Baseline)',
+    label: '0. Idealized Accommodating Reference (Young Phakic Eye 20/20)',
     foci: [{ addD: 0, weight: 1 }],
     assumptions: [
-      'Healthy crystalline lens with normal physiological accommodation',
+      'Healthy crystalline lens with active physiological accommodation (~5.0 D amplitude)',
       'Accommodates continuously to eliminate defocus (0.0 D residual defocus at far, intermediate, and near)',
-      'Provides the gold-standard 20/20 visual acuity reference for comparative patient evaluation',
+      'Provides the idealized 20/20 visual acuity reference baseline for comparative patient evaluation',
     ],
     version: {
-      modelVersion: '1.0.0',
-      date: '2026-10-26',
+      modelVersion: '1.1.0',
+      date: '2026-10-27',
       derivedFrom: 'Diffraction-limited physiological accommodating eye model',
     },
   },
@@ -213,20 +213,20 @@ export const OPTICAL_MODELS: Record<string, OpticalModel> = {
   },
   imported_trifocal: {
     kind: 'advanced-apodized-bench',
-    label: '6. Imported Trifocal — Better Vision & Less of Ring Perception (Apodized)',
+    label: '7. Apodized Trifocal (Zeiss AT LISA tri 839MP)',
     foci: [
       { addD: 0, weight: 0.52 },
       { addD: 1.50, weight: 0.24 }, // Intermediate at ~66 cm
       { addD: 2.75, weight: 0.24 }, // Near at ~36 cm
     ],
     assumptions: [
-      'Advanced apodized diffractive steps engineered specifically to reduce halo ring luminance by ~45% compared to standard trifocals',
-      'Optimized light throughput (>89%) channeling 52% to distance and 48% smoothly divided between intermediate and near',
-      'Clinician design target: "better vision and less of ring perception" through gradual step height reduction toward the periphery',
+      'Apodized diffractive steps engineered with gradual step height reduction toward the periphery',
+      'Channels ~52% to distance and 48% smoothly divided between intermediate and near foci',
+      'Step apodization reduces peripheral diffractive halo luminance compared to full-aperture trifocals',
     ],
     version: {
-      modelVersion: '1.0.0',
-      date: '2026-10-26',
+      modelVersion: '1.1.0',
+      date: '2026-10-27',
       derivedFrom: 'Apodized trifocal bench optics (Carson 2016, Gatinel 2018 JCRS)',
     },
   },

@@ -63,7 +63,7 @@ export const AcuityScorecard: React.FC<AcuityScorecardProps> = ({ lens }) => {
         <div className="p-2 bg-slate-50/80 rounded-xl border border-slate-200/60 flex items-center justify-between">
           <span className="flex items-center gap-1.5 text-slate-700 font-semibold text-[11px]">
             <Compass className="w-3.5 h-3.5 text-sky-600" />
-            Distance (&gt;5m):
+            Distance (10m / 0.10 D):
           </span>
           {renderStarsWithSnellen(ratings.distance, ratings.snellenDistance)}
         </div>
@@ -71,7 +71,7 @@ export const AcuityScorecard: React.FC<AcuityScorecardProps> = ({ lens }) => {
         <div className="p-2 bg-slate-50/80 rounded-xl border border-slate-200/60 flex items-center justify-between">
           <span className="flex items-center gap-1.5 text-slate-700 font-semibold text-[11px]">
             <Monitor className="w-3.5 h-3.5 text-teal-600" />
-            Intermediate (66cm-1m):
+            Intermediate (85cm / 1.18 D):
           </span>
           {renderStarsWithSnellen(ratings.intermediate, ratings.snellenIntermediate)}
         </div>
@@ -79,7 +79,7 @@ export const AcuityScorecard: React.FC<AcuityScorecardProps> = ({ lens }) => {
         <div className="p-2 bg-slate-50/80 rounded-xl border border-slate-200/60 flex items-center justify-between">
           <span className="flex items-center gap-1.5 text-slate-700 font-semibold text-[11px]">
             <Glasses className="w-3.5 h-3.5 text-indigo-600" />
-            Near Reading (40cm):
+            Near Reading (40cm / 2.50 D):
           </span>
           {renderStarsWithSnellen(ratings.near, ratings.snellenNear)}
         </div>

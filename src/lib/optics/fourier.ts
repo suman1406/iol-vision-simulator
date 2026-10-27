@@ -1,17 +1,40 @@
 // Fourier-optics image formation (scalar, monochromatic, incoherent).
 // PSF = |FFT(pupil * exp(i*2*pi*W/lambda))|^2, sampled in object-space angle.
+//
+// Units: D in 1/m, radii in mm, wavelength and OPD in um.
+// W[um] = D * rho[mm]^2 / 2   (the 1e-3 * 1e3 unit factors cancel).
 
 export interface OpticalModel {
   kind: string;
   label: string;
+  /**
+   * Discrete-focus approximation (incoherent sum). Use ONLY for lenses whose
+   * wavefront is not modelled explicitly. Ignored when `radialOpd` or `kinoform`
+   * is present, because those already contain the add power (using both
+   * double-counts it).
+   */
   foci: Array<{ addD: number; weight: number }>;
   assumptions: string[];
+  /** Measured / derived radial OPD profile of the lens (continuous designs: Eyhance, Vivity, PureSee). */
   radialOpd?: {
     lambdaUm: number;
     sign: number;
     rMm: number[];
     waves: number[];
   };
+  /**
+   * Ideal blazed diffractive (kinoform) profile. stepWaves = phase step height in waves
+   * (0.5 -> eta0 = eta1 = 40.5 %). Pupil dependence emerges from the physics.
+   */
+  kinoform?: { addD: number; stepWaves: number };
+  /**
+   * Radius (mm, IOL plane) of the diffractive/multifocal zone for discrete-foci lenses.
+   * Outside it the lens is treated as monofocal (all energy to distance), weighted by area.
+   * Heuristic: only valid for lenses whose peripheral zone is monofocal (e.g. PanOptix 4.5 mm
+   * diameter -> 2.25).
+   */
+  diffractiveZoneMm?: number;
+  /** pupil radius / IOL-plane radius. Defaults to 1 when omitted. */
   pupilToIolScale?: number;
   focusPerPupil?: boolean;
   focusOffsetD?: number;
@@ -26,6 +49,7 @@ export interface OpticalModel {
 export interface PsfResult {
   k: Float64Array;
   size: number;
+  /** Sum of effective focus weights before normalisation (informational; the kernel is energy-normalised). */
   transmitted: number;
 }
 
@@ -85,7 +109,7 @@ export function fft2(re: Float64Array, im: Float64Array, w: number, h: number, i
   }
 }
 
-// Lens wavefront (µm) at IOL-plane radius rMm: linear interpolation of a measured radial OPD profile
+// Lens wavefront (um) at IOL-plane radius rMm: linear interpolation of a measured radial OPD profile
 export function lensWavefront(model: OpticalModel, rMm: number): number {
   const p = model.radialOpd;
   if (!p) return 0;
@@ -96,6 +120,39 @@ export function lensWavefront(model: OpticalModel, rMm: number): number {
   if (i >= n) return p.waves[n - 1] * p.lambdaUm * p.sign;
   const f = (rMm - rs[i - 1]) / (rs[i] - rs[i - 1]);
   return (p.waves[i - 1] + f * (p.waves[i] - p.waves[i - 1])) * p.lambdaUm * p.sign;
+}
+
+/**
+ * Ideal blazed-diffractive OPD (um) at IOL-plane radius rhoMm.
+ * h = 1 reproduces a perfect +addD lens in order 1; h = 0.5 gives the 40.5 / 40.5 % bifocal.
+ * Sign convention matches defocus: a +add lens contributes -addD*rho^2/2.
+ */
+export function kinoformWavefront(addD: number, stepWaves: number, rhoMm: number, lambdaUm: number): number {
+  const u = (addD * rhoMm * rhoMm) / (2 * lambdaUm); // parabolic OPD in waves
+  const frac = ((-u) % 1 + 1) % 1;
+  return stepWaves * frac * lambdaUm;
+}
+
+/**
+ * Foci actually used for PSF synthesis.
+ * - natural eye / continuous / kinoform lenses: a single "focus"; add power lives in the OPD.
+ * - discrete-focus lenses: listed foci, with optional pupil-area weighting outside the diffractive zone.
+ */
+export function effectiveFoci(lens: OpticalModel, pupilMm: number): Array<{ addD: number; weight: number }> {
+  if (lens.kind === 'natural-reference' || lens.radialOpd || lens.kinoform) {
+    return [{ addD: 0, weight: 1 }];
+  }
+  const foci = lens.foci && lens.foci.length ? lens.foci : [{ addD: 0, weight: 1 }];
+  const zone = lens.diffractiveZoneMm;
+  const R = pupilMm / 2;
+  if (!zone || R <= zone) return foci;
+  const inner = (zone / R) ** 2; // area fraction inside the diffractive zone
+  const total = foci.reduce((s, f) => s + f.weight, 0);
+  const out = foci.map((f) => ({ addD: f.addD, weight: f.weight * inner }));
+  const dist = out.find((f) => f.addD === 0);
+  if (dist) dist.weight += total * (1 - inner);
+  else out.push({ addD: 0, weight: total * (1 - inner) });
+  return out;
 }
 
 // Monochromatic PSF for one focus component
@@ -110,7 +167,8 @@ export function psfComponent(opts: {
   const { pupilMm, lambdaUm, defocusD, lens, M, N } = opts;
   const re = new Float64Array(N * N), im = new Float64Array(N * N);
   const R = pupilMm / 2, c = N / 2;
-  const iolScale = lens.radialOpd && lens.pupilToIolScale ? 1 / lens.pupilToIolScale : 0;
+  // FIX: previously the lens OPD was silently dropped when pupilToIolScale was missing.
+  const s = lens.pupilToIolScale ? 1 / lens.pupilToIolScale : 1;
 
   for (let y = 0; y < M; y++) {
     for (let x = 0; x < M; x++) {
@@ -118,11 +176,11 @@ export function psfComponent(opts: {
       const py = (y + 0.5 - M / 2) / (M / 2);
       const r = Math.hypot(px, py);
       if (r > 1) continue;
-      // Defocus OPD (µm) = V[D] * (R[mm])^2 * r^2 / 2
+      // Defocus OPD (um) = D * R^2 * r^2 / 2
       let w = defocusD * R * R * r * r / 2;
-      if (iolScale) {
-        w += lensWavefront(lens, r * R * iolScale);
-      }
+      const rho = r * R * s;
+      if (lens.radialOpd) w += lensWavefront(lens, rho);
+      if (lens.kinoform) w += kinoformWavefront(lens.kinoform.addD, lens.kinoform.stepWaves, rho, lambdaUm);
       const ph = 2 * Math.PI * w / lambdaUm;
       const i = ((y - M / 2 + c + N) % N) * N + ((x - M / 2 + c + N) % N);
       re[i] = Math.cos(ph);
@@ -157,39 +215,40 @@ export function psfForLayer(opts: {
   extentRad?: number;
 }): PsfResult {
   const { pupilMm, lambdaUm, vergenceD, lens, radPerPx } = opts;
-  const foci = lens.foci || [{ addD: 0, weight: 1 }];
+  const foci = effectiveFoci(lens, pupilMm);
+  const natural = lens.kind === 'natural-reference';
+  // Accommodating natural eye is always in focus; otherwise defocus = V - add + offset
+  const defocusOf = (addD: number) => (natural ? 0 : vergenceD - addD + (lens.focusOffsetD || 0));
+  const R = pupilMm / 2;
+
+  // --- Grid sizing -------------------------------------------------------------------------
+  // Full angular field of the FFT grid is lambda*M/p; it must cover +/- extentRad (FIX: was only +extentRad,
+  // so wide PSFs wrapped around), and the pupil must be sampled finely enough for the defocus phase
+  // (and any diffractive zones) not to alias.
   const needRad = opts.extentRad || 0.05;
-  const M = Math.min(512, Math.max(64, 2 ** Math.ceil(Math.log2(needRad * pupilMm * 1e-3 / (lambdaUm * 1e-6)))));
+  const maxDef = Math.max(0, ...foci.map((f) => Math.abs(defocusOf(f.addD))));
+  const mFov = (2 * needRad * pupilMm * 1e-3) / (lambdaUm * 1e-6);
+  const mNyq = (2 * maxDef * R * pupilMm) / lambdaUm;
+  const nZones = lens.kinoform ? (lens.kinoform.addD * R * R) / (2 * lambdaUm) : 0;
+  const want = Math.max(64, mFov, mNyq, 16 * nZones);
+  const pow = 2 ** Math.ceil(Math.log2(want));
+  const M = Math.min(512, pow);
+  if (pow > 512 && typeof console !== 'undefined') {
+    console.warn(`[optics] pupil grid capped at 512 (wanted ${pow}); PSF may be aliased for ${lens.label}`);
+  }
   const N = 2 * M;
   const dA = (lambdaUm * 1e-6) * M / (N * pupilMm * 1e-3);
   const acc = new Float64Array(N * N);
   let wsum = 0;
 
   for (const f of foci) {
-    const rawDefocus = vergenceD - f.addD + (lens.focusOffsetD || 0);
-    // Accommodating natural eye accommodates dynamically to each vergence
-    const defocusD = lens.kind === 'natural-reference' ? 0 : rawDefocus;
-    const absDefocus = Math.abs(defocusD);
-
-    // Foveal neural contrast constancy (Campbell & Robson 1968, Watson 2000, Charman 1991):
-    // In human vision, diffuse low-frequency background out-of-focus light is adapted out.
-    // An in-focus order (|defocus| < 0.45 D) provides the retinal signal for high-contrast edges.
-    const neuralGain = absDefocus <= 0.45 ? (1.0 + 2.5 * Math.cos((Math.PI / 2) * (absDefocus / 0.45))) : 1.0;
-    const effectiveWeight = f.weight * neuralGain;
-
-    const p = psfComponent({
-      pupilMm,
-      lambdaUm,
-      defocusD,
-      lens,
-      M,
-      N,
-    });
-    for (let i = 0; i < acc.length; i++) acc[i] += effectiveWeight * p[i];
-    wsum += effectiveWeight;
+    const p = psfComponent({ pupilMm, lambdaUm, defocusD: defocusOf(f.addD), lens, M, N });
+    // Weight each focus purely by its optical energy allocation.
+    for (let i = 0; i < acc.length; i++) acc[i] += f.weight * p[i];
+    wsum += f.weight;
   }
 
-  // Bin from dA to radPerPx using smooth bilinear splatting (preserves foveal MAR subpixel fidelity)
+  // Bin from dA to radPerPx using bilinear splatting
   const half = Math.max(1, Math.ceil((N * dA / 2) / radPerPx));
   const size = 2 * half + 1;
   const k = new Float64Array(size * size);
@@ -214,10 +273,10 @@ export function psfForLayer(opts: {
     }
   }
 
-  let s = 0;
-  for (let i = 0; i < k.length; i++) s += k[i];
-  if (s > 0) {
-    for (let i = 0; i < k.length; i++) k[i] /= s;
+  let sum = 0;
+  for (let i = 0; i < k.length; i++) sum += k[i];
+  if (sum > 0) {
+    for (let i = 0; i < k.length; i++) k[i] /= sum;
   }
   return { k, size, transmitted: wsum };
 }
@@ -250,8 +309,13 @@ export function mtfAt(opts: {
   return (Math.hypot(sre, sim) + Math.hypot(tre, tim)) / 2;
 }
 
-// Defocus (D) maximising MTF at 835 c/rad (50 lp/mm bench equivalent) for this pupil
+const bestFocusCache = new Map<string, number>();
+
+// Defocus (D) maximising MTF at 835 c/rad (50 lp/mm x ~16.7 mm eye focal length) for this pupil. Cached.
 export function bestFocus(lens: OpticalModel, pupilMm: number, lambdaUm: number): number {
+  const key = `${lens.kind}|${lens.label}|${lens.version?.modelVersion ?? ''}|${pupilMm}|${lambdaUm}`;
+  const hit = bestFocusCache.get(key);
+  if (hit !== undefined) return hit;
   let best = 0, bv = -1;
   for (let v = -1.5; v <= 1.5001; v += 0.0625) {
     const m = mtfAt({ pupilMm, lambdaUm, defocusD: v, lens, M: 128, N: 256 }, 835);
@@ -260,5 +324,6 @@ export function bestFocus(lens: OpticalModel, pupilMm: number, lambdaUm: number)
       best = v;
     }
   }
+  bestFocusCache.set(key, best);
   return best;
 }

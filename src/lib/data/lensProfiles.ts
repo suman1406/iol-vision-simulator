@@ -56,9 +56,13 @@ export function computeRatingsForLens(
   nightDysphotopsia: LensRating['nightDysphotopsia'],
   spectacleIndependence: LensRating['spectacleIndependence']
 ): LensRating {
+  // Standardized scene target vergences:
+  // Far: 10.0 m (defocus = 0.00 D spectacle plane)
+  // Intermediate: 0.85 m (defocus = -1.18 D spectacle plane)
+  // Near: 0.40 m (defocus = -2.50 D spectacle plane)
   const dLogMar = interpolateLogMar(lensId, 0.0);
-  const iLogMar = interpolateLogMar(lensId, -1.5); // 66 cm arm's length
-  const nLogMar = interpolateLogMar(lensId, -2.5); // 40 cm near reading
+  const iLogMar = interpolateLogMar(lensId, -1.18);
+  const nLogMar = interpolateLogMar(lensId, -2.50);
 
   return {
     distance: logMarToScore(dLogMar),
@@ -76,18 +80,18 @@ export const LENS_PROFILES: LensProfile[] = [
   {
     id: 'natural_eye',
     docIndex: '0',
-    name: '0. Natural Eye (20/20 Reference)',
-    shortName: '0. Natural 20/20',
+    name: '0. Idealized Reference (Young Accommodating Eye)',
+    shortName: '0. Idealized 20/20 Ref',
     category: 'Natural',
     colorTheme: 'emerald',
-    model: 'Healthy Phakic Eye with Active Accommodation (Gullstrand Model)',
+    model: 'Young Phakic Eye with Active Physiological Accommodation (~5.0 D amplitude)',
     status: 'clinical-ref',
-    statusText: 'Gold-Standard 20/20 Baseline',
+    statusText: 'Idealized 20/20 Reference Baseline',
     optical: 'natural_eye',
     renderKind: 'reference',
     summary:
-      'Natural healthy crystalline lens with active accommodation. All targets at far (10 m), intermediate (85 cm), and near (40 cm) are in crisp, high-contrast 20/20 focus with zero halos.',
-    patientHighlight: 'Pristine 20/20 clarity across all distances. Use as a gold-standard reference benchmark to evaluate what each IOL restores.',
+      'Theoretical reference baseline representing a healthy young phakic eye with dynamic physiological accommodation, maintaining 0.0 D residual defocus across far (10 m), intermediate (85 cm), and near (40 cm) targets with zero halos.',
+    patientHighlight: 'Pristine 20/20 clarity across all distances. Serves as an idealized physiological benchmark to evaluate functional vision restoration.',
     ratings: computeRatingsForLens('natural_eye', 'Minimal', 'Full Range (Near, Int & Far)'),
     defocusCurves: ['natural_eye'],
     opticalProfiles: [],
@@ -95,7 +99,7 @@ export const LENS_PROFILES: LensProfile[] = [
     effects: {
       blur: {
         status: 'modelled',
-        basis: 'Active physiological accommodation dynamically matches object vergence, maintaining 0.0 D defocus at all viewing distances.',
+        basis: 'Active physiological accommodation dynamically matches target vergence, maintaining 0.0 D defocus at all viewing distances.',
         evidence: [],
       },
       contrast: { status: 'modelled', basis: 'Full MTF contrast preserved across all distances.', evidence: [] },
@@ -106,17 +110,17 @@ export const LENS_PROFILES: LensProfile[] = [
   {
     id: 'monofocal',
     docIndex: '1',
-    name: '1. Standard Monofocal (Alcon Clareon SY60WF)',
+    name: '1. Standard Aspheric Monofocal (Alcon Clareon SY60WF / SN60WF)',
     shortName: '1. Clareon Monofocal',
     category: 'Monofocal',
     colorTheme: 'blue',
     model: 'Standard Aspheric Monofocal (Alcon Clareon SY60WF / AcrySof SN60WF)',
     status: 'clinical-ref',
-    statusText: 'Clinical Control (FDA PMA P930014)',
+    statusText: 'FDA PMA P930014 SSED Control Cohort (n=111)',
     optical: 'monofocal',
     renderKind: 'reference',
     summary:
-      'Standard monofocal distance-corrected IOL. Distant traffic and signs (10 m) are pin-sharp (20/17) with zero night halos; intermediate dashboard (85 cm) has mild blur (20/36) and near phone reading (40 cm) is blurred (20/69), requiring +2.50 D reading glasses.',
+      'Standard monofocal distance-corrected IOL. Distant roadway and signs (10 m) are pin-sharp (20/17) with zero night halos; intermediate dashboard (85 cm) has mild blur (20/29) and near smartphone reading (40 cm) is blurred (20/69), requiring +2.50 D reading glasses.',
     patientHighlight: 'Exceptional distance clarity for driving. Reading glasses are strictly required for smartphone, bill, and computer.',
     ratings: computeRatingsForLens('monofocal', 'Minimal', 'Distance only (Readers needed)'),
     defocusCurves: ['monofocal'],
@@ -125,7 +129,7 @@ export const LENS_PROFILES: LensProfile[] = [
     effects: {
       blur: {
         status: 'modelled',
-        basis: 'Diffraction-limited optical pupil with defocus phase determined by object distance (D = 1/d).',
+        basis: 'Diffraction-limited optical pupil with defocus phase determined by object distance vergence (D = 1/d).',
         evidence: ['fdaSsedVivity'],
       },
       contrast: { status: 'modelled', basis: 'Highest peak distance contrast (0.804 MTF); sharp drop with defocus.', evidence: ['carson2016'] },
@@ -136,7 +140,7 @@ export const LENS_PROFILES: LensProfile[] = [
   {
     id: 'eyhance',
     docIndex: '2',
-    name: '2. Plain Tier-1 EDOF — TECNIS Eyhance (ICB00)',
+    name: '2. Plain Tier-1 EDOF (Johnson & Johnson TECNIS Eyhance ICB00)',
     shortName: '2. Eyhance Tier-1 EDOF',
     category: 'EDOF',
     colorTheme: 'cyan',
@@ -146,8 +150,8 @@ export const LENS_PROFILES: LensProfile[] = [
     optical: 'eyhance',
     renderKind: 'bench-validated',
     summary:
-      'Enhanced monofocal / plain Tier-1 EDOF IOL featuring a progressive power profile smoothly increasing power from periphery to center (+0.85 D). Delivers superior intermediate vision over standard monofocals without inducing diffractive dysphotopsia.',
-    patientHighlight: 'Enhanced intermediate dashboard clarity (20/29 vs 20/36 in monofocal) with zero night halos. Reading glasses still needed for fine near print.',
+      'Enhanced monofocal / plain Tier-1 EDOF IOL featuring a progressive power profile smoothly increasing power from periphery to center (+0.85 D). Delivers enhanced intermediate dashboard vision over standard monofocals without inducing diffractive dysphotopsia.',
+    patientHighlight: 'Enhanced intermediate dashboard clarity (20/26 vs 20/29 in monofocal) with zero night halos. Reading glasses still needed for fine near print.',
     ratings: computeRatingsForLens('eyhance', 'Minimal', 'Distance + Intermediate'),
     defocusCurves: ['eyhance', 'monofocal'],
     opticalProfiles: [],
@@ -158,7 +162,7 @@ export const LENS_PROFILES: LensProfile[] = [
         basis: 'Continuous anterior central power progression (+0.85 D) verified in Mencucci et al. JCRS 2020.',
         evidence: ['mencucci2020'],
       },
-      contrast: { status: 'modelled', basis: 'Monofocal-equivalent distance MTF with extended depth-of-focus to 66 cm.', evidence: ['mencucci2020'] },
+      contrast: { status: 'modelled', basis: 'Monofocal-equivalent distance MTF with extended depth-of-focus.', evidence: ['mencucci2020'] },
       halo: { status: 'modelled', basis: 'Purely refractive continuous surface; zero diffractive halo rings.', evidence: ['mencucci2020'] },
       colour: NO_COLOUR,
     },
@@ -166,13 +170,13 @@ export const LENS_PROFILES: LensProfile[] = [
   {
     id: 'edof',
     docIndex: '3',
-    name: '3. EDOF — TECNIS Symfony (ZXR00)',
+    name: '3. Diffractive EDOF (TECNIS Symfony ZXR00)',
     shortName: '3. Symfony EDOF',
     category: 'EDOF',
     colorTheme: 'sky',
     model: 'Diffractive Echelette EDOF (TECNIS Symfony ZXR00 benchmark)',
     status: 'available',
-    statusText: 'Q1 Bench Validated (Gatinel 2016 JCRS)',
+    statusText: 'Q1 Bench Validated (Gatinel 2016 JCRS & FDA PMA P980040)',
     optical: 'edof',
     renderKind: 'bench-validated',
     summary:
@@ -196,18 +200,18 @@ export const LENS_PROFILES: LensProfile[] = [
   {
     id: 'puresee',
     docIndex: '4a',
-    name: '4. Premium EDOF — TECNIS PureSee',
-    shortName: '4a. PureSee EDOF',
+    name: '4a. Premium Refractive EDOF (TECNIS PureSee DEN00V)',
+    shortName: '4a. PureSee Refractive EDOF',
     category: 'Premium EDOF',
     colorTheme: 'teal',
     model: 'Johnson & Johnson TECNIS PureSee (ZEN00V / DEN00V)',
     status: 'available',
-    statusText: 'Bench Wavefront Validated (Schmid 2024)',
+    statusText: 'Bench Wavefront Validated (Schmid 2024 & Auffarth 2026)',
     optical: 'puresee',
     renderKind: 'lens-specific',
     summary:
       'Purely refractive continuous wavefront-shaping EDOF IOL. Convolved directly from published optical bench wavefront measurements across a 4.51 mm aperture (Schmid & Borkenstein 2024, Clin Ophthalmol).',
-    patientHighlight: 'Zero diffractive halo rings at night. Continuous distance-to-intermediate clarity with functional near phone bill readability (20/37).',
+    patientHighlight: 'Zero diffractive halo rings at night. Continuous distance-to-intermediate clarity with functional near phone readability (20/37).',
     ratings: computeRatingsForLens('puresee', 'Very Low', 'Distance + Intermediate'),
     defocusCurves: ['puresee'],
     opticalProfiles: ['schmid2024'],
@@ -226,18 +230,18 @@ export const LENS_PROFILES: LensProfile[] = [
   {
     id: 'vivity',
     docIndex: '4b',
-    name: '4. Premium EDOF — Alcon Vivity',
+    name: '4b. Premium Non-Diffractive EDOF (Alcon Vivity DFT015 / CCW015)',
     shortName: '4b. Vivity EDOF',
     category: 'Premium EDOF',
     colorTheme: 'emerald',
     model: 'Alcon AcrySof IQ Vivity (DFT015 / Clareon CCW015)',
     status: 'available',
-    statusText: 'Deflectometry Validated (Garzón 2024)',
+    statusText: 'FDA PMA P930014 SSED & Garzón 2024 Open Dataset',
     optical: 'vivity',
     renderKind: 'lens-specific',
     summary:
       'Non-diffractive wavefront-shaping (X-WAVE™) EDOF IOL. Convolved from open optical dataset power profiles (Garzón et al. 2024, Graefe’s Archive) integrated to wavefront OPD.',
-    patientHighlight: 'Monofocal-like low photic phenomena at night with crisp intermediate dashboard clarity (20/25). Near reading requires readers for fine print (20/46).',
+    patientHighlight: 'Monofocal-like low photic phenomena at night with crisp intermediate dashboard clarity (20/24). Near reading requires readers for fine print (20/46).',
     ratings: computeRatingsForLens('vivity', 'Very Low', 'Distance + Intermediate'),
     defocusCurves: ['vivity', 'monofocal'],
     opticalProfiles: ['garzon2024', 'schmid2023'],
@@ -256,18 +260,18 @@ export const LENS_PROFILES: LensProfile[] = [
   {
     id: 'multifocal',
     docIndex: '5',
-    name: '5. Multifocal (Distance & Near)',
-    shortName: '5. Multifocal',
+    name: '5. Illustrative Bifocal Multifocal (+2.50 D Near Add, Half-Wave Kinoform)',
+    shortName: '5. Bifocal Kinoform',
     category: 'Multifocal',
     colorTheme: 'amber',
-    model: 'Half-wave diffractive kinoform (+2.50 D Near Add / 40 cm)',
+    model: 'Simulated Half-Wave Diffractive Kinoform (+2.50 D Spectacle Add / 40 cm)',
     status: 'clinical-ref',
-    statusText: 'Diffraction Theory (Half-Wave Kinoform)',
+    statusText: 'Scalar Diffraction Theory (Illustrative Kinoform Model)',
     optical: 'multifocal',
     renderKind: 'reference',
     summary:
-      'Classic simultaneous vision diffractive bifocal model. Divides light equally (40.5% distance, 40.5% near at +2.50 D spectacle add / 40 cm).',
-    patientHighlight: 'Both distance and near reading are sharp (20/21), but intermediate dashboard (85 cm) has a contrast dip (20/36), and distinct night halos are visible.',
+      'Simulated simultaneous vision diffractive bifocal model. Divides light equally according to scalar diffraction theory (40.5% distance, 40.5% near at +2.50 D spectacle add / 40 cm).',
+    patientHighlight: 'Both distance and near reading are sharp (20/21), but intermediate dashboard (85 cm) exhibits an optical contrast dip (20/30), and distinct night halos are visible.',
     ratings: computeRatingsForLens('multifocal', 'Concentric Halos', 'Distance + Near (Intermediate gap)'),
     defocusCurves: ['multifocal'],
     opticalProfiles: [],
@@ -286,18 +290,18 @@ export const LENS_PROFILES: LensProfile[] = [
   {
     id: 'trifocal',
     docIndex: '6',
-    name: '6. Trifocal Lenses (Distance, Intermediate & Near)',
-    shortName: '6. Trifocal (PanOptix)',
+    name: '6. Diffractive Trifocal (Alcon Clareon PanOptix TFNT00 / CNWET0)',
+    shortName: '6. Clareon PanOptix',
     category: 'Trifocal',
     colorTheme: 'indigo',
     model: 'Alcon Clareon / AcrySof IQ PanOptix (TFNT00 / CNWET0)',
     status: 'available',
-    statusText: 'Q1 Bench Validated (Carson 2016 JCRS)',
+    statusText: 'FDA PMA P040020 SSED & Carson 2016 JCRS',
     optical: 'trifocal',
     renderKind: 'bench-validated',
     summary:
-      'Quadrifocal diffractive design channeling 88% transmitted light across distance, 60 cm intermediate, and 40 cm near foci (Carson et al. 2016 JCRS).',
-    patientHighlight: 'Full spectacle independence: phone bill (20/21) and intermediate dashboard (20/22) are both crisp. Standard diffractive halo rings around headlights at night.',
+      'Quadrifocal diffractive design channeling 88% transmitted light across distance, 60 cm intermediate, and 40 cm near foci (Carson et al. 2016 JCRS; FDA PMA P040020).',
+    patientHighlight: 'Full spectacle independence: phone reading (20/21) and intermediate dashboard (20/22) are both crisp. Standard diffractive halo rings around headlights at night.',
     ratings: computeRatingsForLens('trifocal', 'Mild Rings', 'Full Range (Near, Int & Far)'),
     defocusCurves: ['trifocal'],
     opticalProfiles: ['carson2016'],
@@ -316,18 +320,18 @@ export const LENS_PROFILES: LensProfile[] = [
   {
     id: 'imported_trifocal',
     docIndex: '7',
-    name: '7. Imported Trifocal (Better Vision & Less Ring Perception)',
-    shortName: '7. Imported Trifocal',
+    name: '7. Apodized Trifocal (Zeiss AT LISA tri 839MP)',
+    shortName: '7. Zeiss AT LISA tri',
     category: 'Imported Trifocal',
     colorTheme: 'purple',
-    model: 'Advanced Apodized Trifocal (e.g. Zeiss AT LISA tri 839MP / FineVision HP)',
+    model: 'Zeiss AT LISA tri 839MP (Apodized Diffractive Trifocal)',
     status: 'available',
     statusText: 'Apodized Bench Validated (Carson 2016 / Gatinel 2018)',
     optical: 'imported_trifocal',
     renderKind: 'bench-validated',
     summary:
-      'Doctor-specified imported trifocal with optimized step apodization: engineered to deliver sharp full-range vision with significantly suppressed halo ring perception.',
-    patientHighlight: 'Doc-specified: "Better vision and less of ring perception". Apodized diffractive steps cut halo intensity by ~45% while preserving reading clarity.',
+      'Trifocal IOL with apodized diffractive steps: engineered with gradual step height reduction from center to periphery to reduce peripheral diffractive halo glare while maintaining intermediate and near allocation.',
+    patientHighlight: 'Apodized diffractive steps reduce peripheral halo ring luminance compared to non-apodized full-aperture trifocals, providing continuous distance, intermediate, and near acuity.',
     ratings: computeRatingsForLens('imported_trifocal', 'Suppressed Rings', 'Full Range (Near, Int & Far)'),
     defocusCurves: ['imported_trifocal'],
     opticalProfiles: ['carson2016'],
@@ -339,7 +343,7 @@ export const LENS_PROFILES: LensProfile[] = [
         evidence: ['carson2016'],
       },
       contrast: { status: 'modelled', basis: 'High light throughput (>89%) providing superior contrast.', evidence: ['carson2016'] },
-      halo: { status: 'modelled', basis: 'Gradual step height apodization toward periphery significantly suppresses halo perception.', evidence: ['carson2016'] },
+      halo: { status: 'modelled', basis: 'Gradual step height apodization toward periphery reduces peripheral halo luminance.', evidence: ['carson2016'] },
       colour: NO_COLOUR,
     },
   },

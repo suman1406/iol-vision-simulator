@@ -7,14 +7,17 @@ import { TrendingDown } from 'lucide-react';
 
 interface DefocusCurveChartProps {
   currentLensId: string;
+  compareLensId?: string | null;
   environment: Environment;
 }
 
 export const DefocusCurveChart: React.FC<DefocusCurveChartProps> = ({
   currentLensId,
+  compareLensId,
   environment,
 }) => {
   const currentData = CLINICAL_DEFOCUS_DATA[currentLensId] || CLINICAL_DEFOCUS_DATA['puresee'];
+  const compareData = compareLensId ? CLINICAL_DEFOCUS_DATA[compareLensId] : null;
   const monofocalData = CLINICAL_DEFOCUS_DATA['monofocal'];
 
   const W = 480;
@@ -49,9 +52,15 @@ export const DefocusCurveChart: React.FC<DefocusCurveChartProps> = ({
         <div className="flex items-center gap-2 text-[11px]">
           <span className="flex items-center gap-1 text-sky-700 font-bold">
             <span className="w-2 h-2 rounded-full bg-sky-600 inline-block" />
-            Selected IOL
+            {compareData ? `Lens A (${currentData?.lensName.split(' ')[0] || 'Selected'})` : 'Selected IOL'}
           </span>
-          {currentLensId !== 'monofocal' && (
+          {compareData && (
+            <span className="flex items-center gap-1 text-purple-700 font-bold">
+              <span className="w-2 h-2 rounded-full bg-purple-600 inline-block" />
+              Lens B ({compareData.lensName.split(' ')[0]})
+            </span>
+          )}
+          {!compareData && currentLensId !== 'monofocal' && (
             <span className="flex items-center gap-1 text-slate-400 font-medium">
               <span className="w-2 h-0.5 bg-slate-400 inline-block" />
               Monofocal Ref
@@ -135,6 +144,11 @@ export const DefocusCurveChart: React.FC<DefocusCurveChartProps> = ({
             const isNear = layer.distanceM < 0.6;
             const isIntermediate = layer.distanceM >= 0.6 && layer.distanceM <= 1.5;
             const markerColor = isNear ? '#d97706' : isIntermediate ? '#0284c7' : '#7c3aed';
+            const labelText = isNear
+              ? 'Near (40cm / -2.50D)'
+              : isIntermediate
+              ? 'Int (85cm / -1.18D)'
+              : 'Far (10m / 0.0D)';
 
             return (
               <g key={layer.id}>
@@ -156,7 +170,7 @@ export const DefocusCurveChart: React.FC<DefocusCurveChartProps> = ({
                   fontWeight="bold"
                   textAnchor="middle"
                 >
-                  {isNear ? 'Near' : isIntermediate ? 'Int' : 'Far'} ({layer.distanceM}m)
+                  {labelText}
                 </text>
               </g>
             );
@@ -174,9 +188,24 @@ export const DefocusCurveChart: React.FC<DefocusCurveChartProps> = ({
             />
           )}
 
-          {/* Selected lens clinical defocus curve */}
+          {/* Selected lens clinical defocus curve (Lens A) */}
           {currentData && (
             <>
+              {/* Uncertainty / Confidence Error Bars (when available in dataset) */}
+              {currentData.points.map((p, idx) => {
+                if (p.lo === undefined || p.hi === undefined) return null;
+                const px = dToX(p.d);
+                const yLo = vaToY(p.lo);
+                const yHi = vaToY(p.hi);
+                return (
+                  <g key={`err-${idx}`} opacity="0.65">
+                    <line x1={px} y1={yLo} x2={px} y2={yHi} stroke="#0284c7" strokeWidth="1.2" />
+                    <line x1={px - 2.5} y1={yLo} x2={px + 2.5} y2={yLo} stroke="#0284c7" strokeWidth="1" />
+                    <line x1={px - 2.5} y1={yHi} x2={px + 2.5} y2={yHi} stroke="#0284c7" strokeWidth="1" />
+                  </g>
+                );
+              })}
+
               <path
                 d={makePath(currentData.points)}
                 fill="none"
@@ -190,6 +219,43 @@ export const DefocusCurveChart: React.FC<DefocusCurveChartProps> = ({
                   cy={vaToY(p.va)}
                   r="3"
                   fill="#0369a1"
+                  stroke="#ffffff"
+                  strokeWidth="1.2"
+                />
+              ))}
+            </>
+          )}
+
+          {/* Comparative lens clinical defocus curve (Lens B, if present) */}
+          {compareData && (
+            <>
+              {compareData.points.map((p, idx) => {
+                if (p.lo === undefined || p.hi === undefined) return null;
+                const px = dToX(p.d);
+                const yLo = vaToY(p.lo);
+                const yHi = vaToY(p.hi);
+                return (
+                  <g key={`err-b-${idx}`} opacity="0.65">
+                    <line x1={px} y1={yLo} x2={px} y2={yHi} stroke="#7c3aed" strokeWidth="1.2" />
+                    <line x1={px - 2.5} y1={yLo} x2={px + 2.5} y2={yLo} stroke="#7c3aed" strokeWidth="1" />
+                    <line x1={px - 2.5} y1={yHi} x2={px + 2.5} y2={yHi} stroke="#7c3aed" strokeWidth="1" />
+                  </g>
+                );
+              })}
+
+              <path
+                d={makePath(compareData.points)}
+                fill="none"
+                stroke="#7c3aed"
+                strokeWidth="2.2"
+              />
+              {compareData.points.map((p, idx) => (
+                <circle
+                  key={idx}
+                  cx={dToX(p.d)}
+                  cy={vaToY(p.va)}
+                  r="3"
+                  fill="#6d28d9"
                   stroke="#ffffff"
                   strokeWidth="1.2"
                 />
@@ -211,10 +277,13 @@ export const DefocusCurveChart: React.FC<DefocusCurveChartProps> = ({
         </svg>
       </div>
 
-      <p className="text-[10px] text-slate-500 mt-1.5 flex justify-between">
-        <span><b>Source:</b> {currentData ? currentData.citation.split(',')[0] : 'FDA SSED PMA'}</span>
-        <span className="text-amber-600 font-semibold">Vertical dashed lines = scene distance targets</span>
-      </p>
+      <div className="text-[10px] text-slate-500 mt-1.5 flex flex-wrap justify-between gap-1 items-center">
+        <span>
+          <b>Source:</b> {currentData ? currentData.citation.split(',')[0] : 'FDA SSED'}
+          {compareData ? ` vs. ${compareData.citation.split(',')[0]}` : ''}
+        </span>
+        <span className="text-slate-400">Photopic Binocular BCDVA • Error bars: 95% CI/SD where reported</span>
+      </div>
     </div>
   );
 };

@@ -4,95 +4,75 @@ import React, { useEffect, useRef, useState } from 'react';
 import { LensProfile, LENS_PROFILES } from '../lib/data/lensProfiles';
 import { Environment } from '../lib/data/environments';
 import { OPTICAL_MODELS } from '../lib/data/opticalModels';
-import { renderScene, SceneLayer, RenderResult } from '../lib/optics/renderer';
-import { ZoomIn, Maximize2, RefreshCw, Eye, ArrowLeftRight, Camera } from 'lucide-react';
+import { renderScene, renderDepthBlendedScene, SceneLayer, RenderResult } from '../lib/optics/renderer';
+import { Eye, ArrowLeftRight, Camera, RefreshCw, ZoomIn, Check } from 'lucide-react';
 
-interface SimulatorViewProps {
-  selectedLens: LensProfile;
-  selectedEnv: Environment;
-  onComputingChange?: (computing: boolean) => void;
+const imageCanvasCache = new Map<string, HTMLCanvasElement>();
+const resultCache = new Map<string, RenderResult>();
+
+const loadImageCanvas = (src: string): Promise<HTMLCanvasElement> => {
+  const cached = imageCanvasCache.get(src);
+  if (cached) return Promise.resolve(cached);
+
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = img.naturalWidth;
+      c.height = img.naturalHeight;
+      const ctx = c.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(img, 0, 0);
+        imageCanvasCache.set(src, c);
+        resolve(c);
+      } else {
+        reject(new Error('Failed to get 2d context for image canvas'));
+      }
+    };
+    img.onerror = () => reject(new Error(`Failed to load image asset: ${src}`));
+    img.src = src;
+  });
+};
+
+interface ViewportPaneProps {
+  label: string;
+  lens: LensProfile;
+  env: Environment;
+  zoomMode: 'fit' | 'near' | 'intermediate' | 'far';
+  isComparing: boolean;
+  onSelectLens?: (lens: LensProfile) => void;
+  badgeBg: string;
 }
 
-export const SimulatorView: React.FC<SimulatorViewProps> = ({
-  selectedLens,
-  selectedEnv,
-  onComputingChange,
+const ViewportPane: React.FC<ViewportPaneProps> = ({
+  label,
+  lens,
+  env,
+  zoomMode,
+  isComparing,
+  onSelectLens,
+  badgeBg,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [computing, setComputing] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [zoomMode, setZoomMode] = useState<'fit' | 'near' | 'intermediate' | 'far'>('fit');
   const [renderInfo, setRenderInfo] = useState<RenderResult['layers']>([]);
-  const [compareMode, setCompareMode] = useState<boolean>(false);
-
-  const cacheRef = useRef<Record<string, RenderResult>>({});
-  const loadedScenesRef = useRef<Record<string, { w: number; h: number; layers: SceneLayer[] }>>({});
-
-  const activeDisplayLens = compareMode
-    ? LENS_PROFILES.find((l) => l.id === 'monofocal') || selectedLens
-    : selectedLens;
-
-  const loadImageCanvas = (src: string): Promise<HTMLCanvasElement> => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        const c = document.createElement('canvas');
-        c.width = img.naturalWidth;
-        c.height = img.naturalHeight;
-        const ctx = c.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0);
-          resolve(c);
-        } else {
-          reject(new Error('Failed to get 2d context for image canvas'));
-        }
-      };
-      img.onerror = () => reject(new Error(`Failed to load image asset: ${src}`));
-      img.src = src;
-    });
-  };
-
-  const loadScene = async (env: Environment) => {
-    if (loadedScenesRef.current[env.id]) return loadedScenesRef.current[env.id];
-
-    const layers: SceneLayer[] = [];
-    for (const l of env.layers) {
-      const canvas = await loadImageCanvas(l.file);
-      const emissive = l.emissive ? await loadImageCanvas(l.emissive) : null;
-      layers.push({
-        id: l.id,
-        label: l.label,
-        distanceM: l.distanceM,
-        canvas,
-        emissive,
-      });
-    }
-
-    const scene = {
-      w: layers[0].canvas.width,
-      h: layers[0].canvas.height,
-      layers,
-    };
-    loadedScenesRef.current[env.id] = scene;
-    return scene;
-  };
 
   useEffect(() => {
     let active = true;
-    const key = `${activeDisplayLens.id}|${selectedEnv.id}`;
+    const key = `${lens.id}|${env.id}`;
 
     const executeRender = async () => {
       try {
         setErrorMsg(null);
         setComputing(true);
-        if (onComputingChange) onComputingChange(true);
 
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        if (cacheRef.current[key]) {
-          const cached = cacheRef.current[key];
+        if (resultCache.has(key)) {
+          const cached = resultCache.get(key)!;
           if (canvas.width !== cached.imageData.width || canvas.height !== cached.imageData.height) {
             canvas.width = cached.imageData.width;
             canvas.height = cached.imageData.height;
@@ -101,21 +81,44 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
           if (ctx) ctx.putImageData(cached.imageData, 0, 0);
           setRenderInfo(cached.layers);
           setComputing(false);
-          if (onComputingChange) onComputingChange(false);
           return;
         }
 
-        const sceneData = await loadScene(selectedEnv);
-        if (!active) return;
+        let result: RenderResult;
+        const model = lens.optical ? OPTICAL_MODELS[lens.optical] : null;
 
-        await new Promise((r) => setTimeout(r, 20));
-        if (!active) return;
+        if (env.renderMode === 'depth-blend' && env.baseImage) {
+          const baseCanvas = await loadImageCanvas(env.baseImage);
+          const emissiveCanvas = env.emissiveImage ? await loadImageCanvas(env.emissiveImage) : null;
+          if (!active) return;
 
-        const model = activeDisplayLens.optical ? OPTICAL_MODELS[activeDisplayLens.optical] : null;
-        const result = renderScene(sceneData, selectedEnv, model, !!model);
+          result = renderDepthBlendedScene(
+            {
+              baseCanvas,
+              emissiveCanvas,
+              w: baseCanvas.width,
+              h: baseCanvas.height,
+              farDistM: env.layers[0]?.distanceM || 10.0,
+              intDistM: env.layers[1]?.distanceM || 0.85,
+              nearDistM: env.layers[2]?.distanceM || 0.40,
+            },
+            env,
+            model,
+            !!model
+          );
+        } else {
+          const layers: SceneLayer[] = [];
+          for (const l of env.layers) {
+            const c = await loadImageCanvas(l.file);
+            const e = l.emissive ? await loadImageCanvas(l.emissive) : null;
+            layers.push({ id: l.id, label: l.label, distanceM: l.distanceM, canvas: c, emissive: e });
+          }
+          if (!active) return;
+          result = renderScene({ w: layers[0].canvas.width, h: layers[0].canvas.height, layers }, env, model, !!model);
+        }
 
         if (!active) return;
-        cacheRef.current[key] = result;
+        resultCache.set(key, result);
 
         if (canvas.width !== result.imageData.width || canvas.height !== result.imageData.height) {
           canvas.width = result.imageData.width;
@@ -130,10 +133,7 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
         console.error('Simulation render error:', err);
         setErrorMsg(err.message || 'Error executing optical wave-propagation');
       } finally {
-        if (active) {
-          setComputing(false);
-          if (onComputingChange) onComputingChange(false);
-        }
+        if (active) setComputing(false);
       }
     };
 
@@ -142,7 +142,7 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
     return () => {
       active = false;
     };
-  }, [activeDisplayLens, selectedEnv]);
+  }, [lens, env]);
 
   const getTransformStyle = () => {
     switch (zoomMode) {
@@ -158,46 +158,144 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
   };
 
   return (
-    <div className="bg-white/90 backdrop-blur-md border border-slate-200/80 rounded-2xl overflow-hidden shadow-sm flex flex-col">
-      {/* Viewport Toolbar */}
-      <div className="flex flex-wrap items-center justify-between px-3.5 py-2 bg-gradient-to-r from-slate-50 to-slate-100/60 border-b border-slate-200 text-xs gap-2">
-        <div className="flex items-center gap-2">
-          <span className="font-bold text-slate-800 flex items-center gap-1.5">
-            <Eye className="w-4 h-4 text-sky-600" />
-            <span>Simulation Viewport</span>
+    <div className="bg-white/90 backdrop-blur-md border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs flex flex-col flex-1">
+      {/* Pane Header */}
+      <div className="px-3 py-2 bg-gradient-to-r from-slate-50 to-slate-100/70 border-b border-slate-200 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider text-white shrink-0 ${badgeBg}`}>
+            {label}
           </span>
 
-          {compareMode ? (
-            <span className="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full text-[10px] border border-amber-300 animate-pulse">
-              Comparing vs Monofocal Control
-            </span>
+          {isComparing && onSelectLens ? (
+            <select
+              value={lens.id}
+              onChange={(e) => {
+                const found = LENS_PROFILES.find((l) => l.id === e.target.value);
+                if (found) onSelectLens(found);
+              }}
+              className="text-xs font-bold text-slate-800 bg-white border border-slate-300 rounded-lg px-2 py-1 shadow-2xs focus:outline-hidden focus:ring-2 focus:ring-sky-500 truncate max-w-full"
+            >
+              {LENS_PROFILES.map((l) => (
+                <option key={l.id} value={l.id}>
+                  {l.name}
+                </option>
+              ))}
+            </select>
           ) : (
-            <span className="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full text-[10px] border border-emerald-300">
-              {activeDisplayLens.shortName}
+            <span className="font-bold text-slate-800 text-xs truncate">
+              {lens.name}
             </span>
           )}
         </div>
 
-        {/* Quick Inspection & Comparison Actions */}
-        <div className="flex items-center gap-1.5">
-          {selectedLens.id !== 'monofocal' && (
-            <button
-              onMouseDown={() => setCompareMode(true)}
-              onMouseUp={() => setCompareMode(false)}
-              onTouchStart={() => setCompareMode(true)}
-              onTouchEnd={() => setCompareMode(false)}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold transition select-none ${
-                compareMode
-                  ? 'bg-amber-500 text-white shadow-sm ring-2 ring-amber-300'
-                  : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-300'
-              }`}
-            >
-              <ArrowLeftRight className="w-3 h-3 text-amber-500" />
-              <span>Hold to Compare vs Monofocal</span>
-            </button>
-          )}
+        <span className="text-[10px] font-medium text-slate-500 bg-white px-2 py-0.5 rounded-full border border-slate-200 shrink-0">
+          {lens.category}
+        </span>
+      </div>
 
-          <div className="flex items-center gap-0.5 bg-white p-0.5 rounded-lg border border-slate-200 shadow-2xs">
+      {/* Optical Canvas Display */}
+      <div className="relative w-full aspect-[960/640] overflow-hidden bg-slate-950 flex items-center justify-center">
+        <canvas
+          ref={canvasRef}
+          width={960}
+          height={640}
+          style={{ transform: getTransformStyle(), transformOrigin: 'center center' }}
+          className="w-full h-full object-contain transition-transform duration-300 ease-out"
+        />
+
+        {/* Loading Spinner */}
+        {computing && (
+          <div className="absolute inset-0 bg-white/80 backdrop-blur-xs flex flex-col items-center justify-center gap-2 z-20">
+            <RefreshCw className="w-7 h-7 text-sky-600 animate-spin" />
+            <p className="text-xs font-bold text-slate-800">Computing Wave-Optics PSF...</p>
+          </div>
+        )}
+
+        {/* Error notification */}
+        {errorMsg && (
+          <div className="absolute inset-0 bg-red-950/90 text-white p-4 flex items-center justify-center text-xs">
+            {errorMsg}
+          </div>
+        )}
+      </div>
+
+      {/* Pane Footer Info */}
+      <div className="px-3 py-1.5 bg-slate-50/90 border-t border-slate-200/80 text-[10px] flex items-center justify-between text-slate-600">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="font-semibold text-slate-700">Scene Planes:</span>
+          {renderInfo.map((info) => (
+            <span
+              key={info.id}
+              className="bg-white border border-slate-200 px-1.5 py-0.2 rounded font-mono text-slate-700 shadow-2xs"
+            >
+              <b>{info.id}:</b> {info.vergenceD.toFixed(2)} D
+            </span>
+          ))}
+        </div>
+        <span className="text-slate-400 font-medium">Fourier Wave-Optics</span>
+      </div>
+    </div>
+  );
+};
+
+export interface SimulatorViewProps {
+  selectedLens: LensProfile;
+  compareLens: LensProfile;
+  selectedEnv: Environment;
+  isCompareMode: boolean;
+  onToggleCompareMode: (compare: boolean) => void;
+  onSelectLens: (lens: LensProfile) => void;
+  onSelectCompareLens: (lens: LensProfile) => void;
+}
+
+export const SimulatorView: React.FC<SimulatorViewProps> = ({
+  selectedLens,
+  compareLens,
+  selectedEnv,
+  isCompareMode,
+  onToggleCompareMode,
+  onSelectLens,
+  onSelectCompareLens,
+}) => {
+  const [zoomMode, setZoomMode] = useState<'fit' | 'near' | 'intermediate' | 'far'>('fit');
+
+  const handleSavePhoto = () => {
+    const canvases = document.querySelectorAll('canvas');
+    if (canvases.length === 0) return;
+    const canvas = canvases[0] as HTMLCanvasElement;
+    const link = document.createElement('a');
+    link.download = `IOL_Simulation_${selectedLens.id}_${selectedEnv.id}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  };
+
+  return (
+    <div className="flex flex-col gap-2.5">
+      {/* Master Viewport Toolbar */}
+      <div className="flex flex-wrap items-center justify-between px-3 py-2 bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-2xl shadow-xs text-xs gap-2">
+        {/* Left: Viewport Mode & Title */}
+        <div className="flex items-center gap-2">
+          <span className="font-bold text-slate-800 flex items-center gap-1.5">
+            <Eye className="w-4 h-4 text-sky-600" />
+            <span className="hidden sm:inline">Visual Simulation Viewport</span>
+          </span>
+
+          <button
+            onClick={() => onToggleCompareMode(!isCompareMode)}
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition shadow-xs cursor-pointer ${
+              isCompareMode
+                ? 'bg-purple-600 hover:bg-purple-700 text-white ring-2 ring-purple-300'
+                : 'bg-white hover:bg-slate-100 text-slate-800 border border-slate-300'
+            }`}
+          >
+            <ArrowLeftRight className="w-3.5 h-3.5 text-purple-500" />
+            <span>{isCompareMode ? 'Exit Side-by-Side' : '⇄ Compare Side-by-Side'}</span>
+          </button>
+        </div>
+
+        {/* Right: Synchronized Inspection Zoom Modes & Export */}
+        <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-0.5 bg-slate-100/90 p-0.5 rounded-lg border border-slate-200 shadow-2xs">
             <button
               onClick={() => setZoomMode('fit')}
               className={`px-2 py-0.5 rounded text-[11px] font-semibold transition ${
@@ -220,7 +318,7 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
                 zoomMode === 'intermediate' ? 'bg-sky-600 text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              🖥️ Int (1m)
+              🖥️ Int (85cm)
             </button>
             <button
               onClick={() => setZoomMode('far')}
@@ -233,63 +331,39 @@ export const SimulatorView: React.FC<SimulatorViewProps> = ({
           </div>
 
           <button
-            onClick={() => {
-              const canvas = canvasRef.current;
-              if (!canvas) return;
-              const link = document.createElement('a');
-              link.download = `IOL_Simulation_${activeDisplayLens.id}_${selectedEnv.id}.png`;
-              link.href = canvas.toDataURL('image/png');
-              link.click();
-            }}
-            title="Download or save simulation view as a high-resolution Photo (PNG)"
+            onClick={handleSavePhoto}
+            title="Download simulation viewport as PNG"
             className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 shadow-2xs transition"
           >
             <Camera className="w-3.5 h-3.5 text-sky-600" />
-            <span>Save Photo</span>
+            <span className="hidden sm:inline">Save Photo</span>
           </button>
         </div>
       </div>
 
-      {/* Optical Canvas Display */}
-      <div className="relative w-full aspect-[960/640] overflow-hidden bg-slate-950 flex items-center justify-center">
-        <canvas
-          ref={canvasRef}
-          width={960}
-          height={640}
-          style={{ transform: getTransformStyle(), transformOrigin: 'center center' }}
-          className="w-full h-full object-contain transition-transform duration-300 ease-out"
+      {/* Main Viewport Grid (Single vs Dual Side-by-Side) */}
+      <div className={`grid gap-3.5 ${isCompareMode ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'}`}>
+        <ViewportPane
+          label={isCompareMode ? 'Lens A' : 'Selected IOL'}
+          lens={selectedLens}
+          env={selectedEnv}
+          zoomMode={zoomMode}
+          isComparing={isCompareMode}
+          onSelectLens={onSelectLens}
+          badgeBg="bg-sky-600"
         />
 
-        {/* Loading Spinner */}
-        {computing && (
-          <div className="absolute inset-0 bg-white/80 backdrop-blur-xs flex flex-col items-center justify-center gap-2 z-20">
-            <RefreshCw className="w-7 h-7 text-sky-600 animate-spin" />
-            <p className="text-xs font-bold text-slate-800">Computing Fourier Optical Simulation...</p>
-          </div>
+        {isCompareMode && (
+          <ViewportPane
+            label="Lens B"
+            lens={compareLens}
+            env={selectedEnv}
+            zoomMode={zoomMode}
+            isComparing={isCompareMode}
+            onSelectLens={onSelectCompareLens}
+            badgeBg="bg-purple-600"
+          />
         )}
-
-        {/* Error notification */}
-        {errorMsg && (
-          <div className="absolute inset-0 bg-red-950/90 text-white p-4 flex items-center justify-center text-xs">
-            {errorMsg}
-          </div>
-        )}
-      </div>
-
-      {/* Bottom Compact Diagnostic Bar */}
-      <div className="px-3 py-1.5 bg-slate-50 border-t border-slate-200/80 text-[11px] flex flex-wrap items-center justify-between gap-1 text-slate-600">
-        <div className="flex items-center gap-1.5">
-          <span className="font-semibold text-slate-700">Vergences:</span>
-          {renderInfo.map((info) => (
-            <span
-              key={info.id}
-              className="bg-white border border-slate-200 px-1.5 py-0.2 rounded font-mono text-[10px] text-slate-700"
-            >
-              <b>{info.id}:</b> {info.vergenceD.toFixed(1)}D ({info.kernelSize}px)
-            </span>
-          ))}
-        </div>
-        <span className="italic text-slate-500 truncate max-w-xs">{selectedEnv.credit}</span>
       </div>
     </div>
   );
