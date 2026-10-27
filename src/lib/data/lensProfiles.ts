@@ -57,10 +57,10 @@ export function computeRatingsForLens(
   spectacleIndependence: LensRating['spectacleIndependence']
 ): LensRating {
   // Standardized scene target vergences:
-  // Far: 10.0 m (defocus = 0.00 D spectacle plane)
+  // Far: 10.0 m (defocus = -0.10 D spectacle plane)
   // Intermediate: 0.85 m (defocus = -1.18 D spectacle plane)
   // Near: 0.40 m (defocus = -2.50 D spectacle plane)
-  const dLogMar = interpolateLogMar(lensId, 0.0);
+  const dLogMar = interpolateLogMar(lensId, -0.10);
   const iLogMar = interpolateLogMar(lensId, -1.18);
   const nLogMar = interpolateLogMar(lensId, -2.50);
 
@@ -95,14 +95,14 @@ export const LENS_PROFILES: LensProfile[] = [
     ratings: computeRatingsForLens('natural_eye', 'Minimal', 'Full Range (Near, Int & Far)'),
     defocusCurves: ['natural_eye'],
     opticalProfiles: [],
-    references: [],
+    references: ['campbell1968'],
     effects: {
       blur: {
         status: 'modelled',
         basis: 'Active physiological accommodation dynamically matches target vergence, maintaining 0.0 D defocus at all viewing distances.',
-        evidence: [],
+        evidence: ['campbell1968'],
       },
-      contrast: { status: 'modelled', basis: 'Full MTF contrast preserved across all distances.', evidence: [] },
+      contrast: { status: 'modelled', basis: 'Full MTF contrast preserved across all distances.', evidence: ['campbell1968'] },
       halo: { status: 'modelled', basis: 'Zero diffractive dysphotopsia or halos.', evidence: [] },
       colour: NO_COLOUR,
     },
@@ -125,15 +125,15 @@ export const LENS_PROFILES: LensProfile[] = [
     ratings: computeRatingsForLens('monofocal', 'Minimal', 'Distance only (Readers needed)'),
     defocusCurves: ['monofocal'],
     opticalProfiles: [],
-    references: ['fdaSsedVivity', 'nct03274986', 'carson2016'],
+    references: ['fdaSsedMonofocal', 'nct03274986', 'carson2016'],
     effects: {
       blur: {
         status: 'modelled',
         basis: 'Diffraction-limited optical pupil with defocus phase determined by object distance vergence (D = 1/d).',
-        evidence: ['fdaSsedVivity'],
+        evidence: ['fdaSsedMonofocal'],
       },
       contrast: { status: 'modelled', basis: 'Highest peak distance contrast (0.804 MTF); sharp drop with defocus.', evidence: ['carson2016'] },
-      halo: { status: 'modelled', basis: 'Absence of diffractive dysphotopsia rings around headlights.', evidence: ['fdaSsedVivity'] },
+      halo: { status: 'modelled', basis: 'Absence of diffractive dysphotopsia rings around headlights.', evidence: ['fdaSsedMonofocal'] },
       colour: NO_COLOUR,
     },
   },
@@ -144,25 +144,25 @@ export const LENS_PROFILES: LensProfile[] = [
     shortName: '2. Eyhance Tier-1 EDOF',
     category: 'EDOF',
     colorTheme: 'cyan',
-    model: 'Enhanced Monofocal with Progressive Central Power (TECNIS Eyhance ICB00)',
+    model: 'Enhanced Monofocal with Progressive Continuous Aspheric Power (TECNIS Eyhance ICB00)',
     status: 'available',
-    statusText: 'Q1 Peer-Reviewed Validated (Mencucci 2020 JCRS)',
+    statusText: 'Q1 Multicenter Validated (Auffarth 2021 & Mencucci 2020)',
     optical: 'eyhance',
     renderKind: 'bench-validated',
     summary:
-      'Enhanced monofocal / plain Tier-1 EDOF IOL featuring a progressive power profile smoothly increasing power from periphery to center (+0.85 D). Delivers enhanced intermediate dashboard vision over standard monofocals without inducing diffractive dysphotopsia.',
+      'Enhanced monofocal / plain Tier-1 EDOF IOL featuring a continuous progressive aspheric power profile smoothly increasing power from periphery to center (+0.65 D). Delivers enhanced intermediate dashboard vision over standard monofocals without inducing diffractive dysphotopsia.',
     patientHighlight: 'Enhanced intermediate dashboard clarity (20/26 vs 20/29 in monofocal) with zero night halos. Reading glasses still needed for fine near print.',
     ratings: computeRatingsForLens('eyhance', 'Minimal', 'Distance + Intermediate'),
     defocusCurves: ['eyhance', 'monofocal'],
-    opticalProfiles: [],
-    references: ['mencucci2020', 'auffarth2021'],
+    opticalProfiles: ['alarcon2020'],
+    references: ['auffarth2021', 'mencucci2020', 'alarcon2020'],
     effects: {
       blur: {
         status: 'modelled',
-        basis: 'Continuous anterior central power progression (+0.85 D) verified in Mencucci et al. JCRS 2020.',
-        evidence: ['mencucci2020'],
+        basis: 'Continuous higher-order anterior aspheric surface power progression (+0.65 D) verified in Alarcon et al. 2020 & Auffarth et al. 2021.',
+        evidence: ['auffarth2021', 'mencucci2020', 'alarcon2020'],
       },
-      contrast: { status: 'modelled', basis: 'Monofocal-equivalent distance MTF with extended depth-of-focus.', evidence: ['mencucci2020'] },
+      contrast: { status: 'modelled', basis: 'Monofocal-equivalent distance MTF with extended depth-of-focus.', evidence: ['alarcon2020'] },
       halo: { status: 'modelled', basis: 'Purely refractive continuous surface; zero diffractive halo rings.', evidence: ['mencucci2020'] },
       colour: NO_COLOUR,
     },
@@ -176,24 +176,24 @@ export const LENS_PROFILES: LensProfile[] = [
     colorTheme: 'sky',
     model: 'Diffractive Echelette EDOF (TECNIS Symfony ZXR00 benchmark)',
     status: 'available',
-    statusText: 'Q1 Bench Validated (Gatinel 2016 JCRS & FDA PMA P980040)',
+    statusText: 'Q1 Multicenter Validated (Cochener 2016 & Gatinel 2016)',
     optical: 'edof',
     renderKind: 'bench-validated',
     summary:
-      'Diffractive echelette extended depth of focus IOL. Utilizes kinoform phase steps to elongate the focal zone across +1.75 D, providing continuous intermediate and functional near clarity.',
+      'Diffractive echelette extended depth of focus IOL. Utilizes kinoform phase steps to elongate the focal zone continuously across +1.75 D, providing continuous intermediate and functional near clarity.',
     patientHighlight: 'Continuous intermediate focus for dashboard and computer; mild diffractive rings around bright night headlights.',
     ratings: computeRatingsForLens('edof', 'Mild Rings', 'Distance + Intermediate'),
     defocusCurves: ['edof'],
     opticalProfiles: ['gatinel2016'],
-    references: ['gatinel2016'],
+    references: ['cochener2016', 'fdaSsedSymfony', 'gatinel2016'],
     effects: {
       blur: {
         status: 'modelled',
-        basis: 'Elongated through-focus MTF plateau profile from Gatinel & Loicq 2016 JCRS (50 lp/mm, 3.0 mm pupil).',
-        evidence: ['gatinel2016'],
+        basis: 'Elongated through-focus MTF plateau profile from Gatinel & Loicq 2016 JCRS and CONCERTO multicenter study (Cochener et al. 2016).',
+        evidence: ['cochener2016', 'gatinel2016'],
       },
       contrast: { status: 'modelled', basis: 'Sustained intermediate MTF with mild distance peak trade-off.', evidence: ['gatinel2016'] },
-      halo: { status: 'modelled', basis: 'Diffractive echelette steps generate a mild starburst/halo ring at mesopic apertures.', evidence: ['gatinel2016'] },
+      halo: { status: 'modelled', basis: 'Diffractive echelette steps generate a mild starburst/halo ring at mesopic apertures.', evidence: ['fdaSsedSymfony', 'gatinel2016'] },
       colour: NO_COLOUR,
     },
   },
@@ -220,10 +220,10 @@ export const LENS_PROFILES: LensProfile[] = [
       blur: {
         status: 'modelled',
         basis: 'Digitized radial OPD wavefront (Schmid & Borkenstein 2024) convolved via 2D Fast Fourier Transform.',
-        evidence: ['schmid2024'],
+        evidence: ['schmid2024', 'auffarth2026'],
       },
       contrast: { status: 'modelled', basis: 'Through-focus MTF at 50 lp/mm (peak 0.38 at 3.0 mm pupil).', evidence: ['schmid2024'] },
-      halo: { status: 'modelled', basis: 'Continuous refractive surface completely avoids diffractive ring dysphotopsia.', evidence: ['schmid2024'] },
+      halo: { status: 'modelled', basis: 'Continuous refractive surface completely avoids diffractive ring dysphotopsia.', evidence: ['auffarth2026', 'schmid2024'] },
       colour: NO_COLOUR,
     },
   },
@@ -252,7 +252,7 @@ export const LENS_PROFILES: LensProfile[] = [
         basis: 'Radial power profile from phase-shifting Schlieren deflectometry integrated to wavefront.',
         evidence: ['garzon2024'],
       },
-      contrast: { status: 'modelled', basis: 'Corroborated by NCT03274986 mesopic contrast sensitivity trial data.', evidence: ['nct03274986'] },
+      contrast: { status: 'modelled', basis: 'Corroborated by NCT03274986 mesopic contrast sensitivity trial data.', evidence: ['nct03274986', 'schmid2023'] },
       halo: { status: 'modelled', basis: 'Smooth surface elevation avoids phase step rings (severe halos only 0.9% in FDA trial).', evidence: ['fdaSsedVivity'] },
       colour: NO_COLOUR,
     },
@@ -275,15 +275,15 @@ export const LENS_PROFILES: LensProfile[] = [
     ratings: computeRatingsForLens('multifocal', 'Concentric Halos', 'Distance + Near (Intermediate gap)'),
     defocusCurves: ['multifocal'],
     opticalProfiles: [],
-    references: [],
+    references: ['fdaSsedMultifocal', 'goodman1996'],
     effects: {
       blur: {
         status: 'modelled',
         basis: 'Ideal half-wave kinoform order efficiency: 40.5% distance, 40.5% near (+2.50 D), ~19% other orders.',
-        evidence: [],
+        evidence: ['goodman1996'],
       },
-      contrast: { status: 'modelled', basis: 'Non-focusing order forms background veil that reduces contrast.', evidence: [] },
-      halo: { status: 'modelled', basis: 'Out-of-focus near light forms an optical halo disc around night light sources.', evidence: [] },
+      contrast: { status: 'modelled', basis: 'Non-focusing order forms background veil that reduces contrast.', evidence: ['fdaSsedMultifocal', 'goodman1996'] },
+      halo: { status: 'modelled', basis: 'Out-of-focus near light forms an optical halo disc around night light sources.', evidence: ['fdaSsedMultifocal'] },
       colour: NO_COLOUR,
     },
   },
@@ -300,20 +300,20 @@ export const LENS_PROFILES: LensProfile[] = [
     optical: 'trifocal',
     renderKind: 'bench-validated',
     summary:
-      'Quadrifocal diffractive design channeling 88% transmitted light across distance, 60 cm intermediate, and 40 cm near foci (Carson et al. 2016 JCRS; FDA PMA P040020).',
+      'Quadrifocal diffractive design channeling 88% transmitted light across distance, 60 cm intermediate, and 40 cm near foci (Carson et al. 2016 JCRS; Modi et al. 2021; FDA PMA P040020).',
     patientHighlight: 'Full spectacle independence: phone reading (20/21) and intermediate dashboard (20/22) are both crisp. Standard diffractive halo rings around headlights at night.',
     ratings: computeRatingsForLens('trifocal', 'Mild Rings', 'Full Range (Near, Int & Far)'),
     defocusCurves: ['trifocal'],
     opticalProfiles: ['carson2016'],
-    references: ['carson2016', 'panoptixDesign'],
+    references: ['modi2021', 'fdaSsedPanOptix', 'carson2016', 'panoptixDesign'],
     effects: {
       blur: {
         status: 'modelled',
-        basis: 'Discrete optical focal distribution (0 D, +1.68 D, +2.51 D) with published 50/25/25 energy split (Carson et al. 2016).',
-        evidence: ['carson2016'],
+        basis: 'Discrete optical focal distribution (0 D, +1.68 D, +2.51 D) with published 50/25/25 energy split (Carson et al. 2016; Modi et al. 2021).',
+        evidence: ['modi2021', 'carson2016'],
       },
       contrast: { status: 'modelled', basis: 'Modest MTF reduction across 3 foci matching bench data.', evidence: ['carson2016'] },
-      halo: { status: 'modelled', basis: 'Diffractive echelette rings generate circular night halos.', evidence: ['carson2016'] },
+      halo: { status: 'modelled', basis: 'Diffractive echelette rings generate circular night halos.', evidence: ['carson2016', 'fdaSsedPanOptix'] },
       colour: NO_COLOUR,
     },
   },
@@ -326,7 +326,7 @@ export const LENS_PROFILES: LensProfile[] = [
     colorTheme: 'purple',
     model: 'Zeiss AT LISA tri 839MP (Apodized Diffractive Trifocal)',
     status: 'available',
-    statusText: 'Apodized Bench Validated (Carson 2016 / Gatinel 2018)',
+    statusText: 'Apodized Multicenter Validated (Mojzis 2014 & Carson 2016)',
     optical: 'imported_trifocal',
     renderKind: 'bench-validated',
     summary:
@@ -335,15 +335,15 @@ export const LENS_PROFILES: LensProfile[] = [
     ratings: computeRatingsForLens('imported_trifocal', 'Suppressed Rings', 'Full Range (Near, Int & Far)'),
     defocusCurves: ['imported_trifocal'],
     opticalProfiles: ['carson2016'],
-    references: ['carson2016'],
+    references: ['mojzis2014', 'kohnen2016', 'carson2016'],
     effects: {
       blur: {
         status: 'modelled',
-        basis: 'Apodized diffractive profile channeling 52% distance, 24% intermediate (~66 cm), 24% near (~36 cm).',
-        evidence: ['carson2016'],
+        basis: 'Apodized diffractive profile channeling 50% distance, 20% intermediate (~66 cm), 30% near (~36 cm) of 85.7% transmitted energy (Carson 2016; Mojzis 2014).',
+        evidence: ['mojzis2014', 'carson2016'],
       },
-      contrast: { status: 'modelled', basis: 'High light throughput (>89%) providing superior contrast.', evidence: ['carson2016'] },
-      halo: { status: 'modelled', basis: 'Gradual step height apodization toward periphery reduces peripheral halo luminance.', evidence: ['carson2016'] },
+      contrast: { status: 'modelled', basis: 'High light throughput (>85%) providing superior contrast.', evidence: ['carson2016'] },
+      halo: { status: 'modelled', basis: 'Gradual step height apodization toward periphery reduces peripheral halo luminance.', evidence: ['carson2016', 'kohnen2016'] },
       colour: NO_COLOUR,
     },
   },

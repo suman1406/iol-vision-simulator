@@ -140,54 +140,56 @@ Human display images are gamma-encoded (sRGB). Optical image formation occurs ex
 
 | IOL Model | Platform | Design Type | Primary Q1 Reference | Optical Verification Metric |
 |---|---|---|---|---|
-| **TECNIS PureSee** | ZEN00V / DEN00V | Refractive Wavefront EDOF | Schmid & Borkenstein, *Clin Ophthalmol* 2024;18:1921–1932 (Q1) | WaveMaster 4.51 mm wavefront OPD; Fig 3 through-focus MTF peak 0.38 at 3.0 mm |
-| **Alcon Vivity** | DFT015 / CCW015 | Non-Diffractive Wavefront EDOF | Garzón et al., *Graefe's Arch Clin Exp Ophthalmol* 2024;262:2897–2906 (Q1) | NIMO TR1504 power profile across 4.5 mm; validated vs Schmid 2023 bench MTF |
-| **Alcon PanOptix** | TFNT00 / CNWET0 | Diffractive Quadrifocal / Trifocal | Carson et al., *J Cataract Refract Surg* 2016;42:1361–1367 (Q1) | Optikos bench MTF at 50 lp/mm (3.0 & 4.5 mm); 60 cm intermediate & 40 cm near peaks |
-| **Zeiss AT LISA tri** | 839MP | Diffractive Trifocal | Carson et al., *J Cataract Refract Surg* 2016;42:1361–1367 (Q1) | ISO 11979 bench MTF; 80 cm intermediate & 37 cm near peaks |
-| **TECNIS Symfony** | ZXR00 | Diffractive Echelette EDOF | Gatinel & Loicq, *J Cataract Refract Surg* 2016;42:1498–1504 (Q1) | PMTF bench system; through-focus MTF plateau spanning +1.75 D |
 | **AcrySof IQ Monofocal** | SN60WF / SY60WF | Aspheric Monofocal | FDA PMA P930014/S126 SSED & Carson et al. 2016 JCRS | Diffraction-limited baseline (analytic MTF 0.807 at 835 c/rad, 50 lp/mm bench) |
+| **TECNIS Eyhance** | ICB00 / DIB00 | Plain Tier-1 EDOF | Auffarth et al. 2021 JCRS; Mencucci et al. 2020 JCRS; Alarcon et al. 2020 JCRS | Continuous higher-order aspheric surface OPD (+0.65 D over central 1.0 mm); continuous intermediate MTF extension |
+| **TECNIS Symfony** | ZXR00 | Diffractive Echelette EDOF | Cochener et al. 2016 JCRS (CONCERTO, n=148); Gatinel & Loicq 2016 JCRS | PMTF bench system & FDA PMA P980040/S065; through-focus MTF plateau spanning +1.75 D |
+| **TECNIS PureSee** | ZEN00V / DEN00V | Purely Refractive Wavefront EDOF | Schmid & Borkenstein 2024 Clin Ophthalmol; Auffarth et al. 2026 Clin Ophthalmol | WaveMaster 4.51 mm wavefront OPD; Fig 3 through-focus MTF peak 0.38 at 3.0 mm |
+| **Alcon Vivity** | DFT015 / CCW015 | Non-Diffractive Wavefront EDOF | Garzón et al. 2024 Graefe's Archive; FDA PMA P930014/S126 SSED | NIMO TR1504 power profile across 4.5 mm referenced to distance skirt (19.75 D); validated vs Schmid 2023 bench MTF |
+| **Diffractive Multifocal** | +2.50 D Bifocal | Half-Wave Kinoform Bifocal | Goodman 1996; Buralli et al. 1989 Appl Opt; FDA PMA P980040/S049 | Scalar diffraction theory: 40.53% far, 40.53% near, 18.94% higher-order straylight veil |
+| **Alcon PanOptix** | TFNT00 / CNWET0 | Diffractive Quadrifocal / Trifocal | Carson et al. 2016 JCRS; Modi et al. 2021 JCRS (n=127); FDA PMA P040020/S087 | Optikos bench MTF at 50 lp/mm (3.0 & 4.5 mm); 60 cm intermediate & 40 cm near peaks; 4.5 mm diffractive zone |
+| **Zeiss AT LISA tri** | 839MP | Apodized Diffractive Trifocal | Mojzis et al. 2014 JCRS (n=60); Kohnen et al. 2016 AJO (n=95); Carson 2016 JCRS | Central 4.34 mm trifocal zone transitioning to refractive periphery; 85.7% light throughput |
 
 ---
 
-## 6. Foveal Neural Contrast Constancy & Legibility Modeling
+## 6. Psychophysical Area Under the MTF (MTFa) & Clinical Defocus Reconciliation
 
-### 6.1 The Paradox of Simultaneous-Vision IOLs
-In diffractive multifocal and trifocal IOLs (e.g., PanOptix, AT LISA tri), transmitted light is divided across multiple diffraction orders:
-- $\approx 50\%$ to distance ($0.0\,\text{D}$)
-- $\approx 25\%$ to intermediate ($+1.68\,\text{D}$)
-- $\approx 25\%$ to near ($+2.51\,\text{D}$)
+### 6.1 The Simultaneous-Vision Contrast Paradox
+In diffractive multifocal and trifocal IOLs (e.g., PanOptix, AT LISA tri), transmitted light is distributed across discrete diffraction orders (e.g. 50% distance, 25% intermediate, 25% near). When viewing an object at reading distance (40 cm / +2.50 D), the near order forms an in-focus diffraction core, while the remaining orders create an expansive background blur veil.
 
-When viewing an object at reading distance ($40\,\text{cm}$ / $+2.50\,\text{D}$), the near order creates a diffraction-limited sharp focal image. However, the other $75\%$ of light is out of focus ($+2.50\,\text{D}$ and $+0.82\,\text{D}$ defocus), forming an expansive blur disc ($29 \times 29$ pixels).
+Under naive passive linear optical convolution, this background veil reduces letter contrast. However, in human vision, **neural contrast constancy** (Campbell & Robson 1968, Watson 2000) and cortical bandpass filtering enable cataract patients with diffractive multifocal and trifocal IOLs to achieve 20/20 reading acuity (FDA PMA P040020 SSED; Modi et al. 2021).
 
-Under a naive linear camera convolution, adding $75\%$ unfocused light onto fine $2$-pixel text strokes drops display Michelson contrast to $\approx 14\%$, turning dark letters into faint gray smudges. However, **real cataract patients with trifocals consistently achieve 20/20 reading acuity** (Carson 2016 JCRS, Alcon FDA PMA Summary).
+### 6.2 Mathematical Reconciliation Pipeline (Stages 2 & 3)
+1. **Area Under the MTF (MTFa):**
+   Integrated across clinically relevant spatial frequencies $f_k \in [5, 10, 15, 20, 25, 30, 40, 50]$ lp/mm (where $1\text{ lp/mm} \approx 16.7\text{ cycles/rad}$), weighted by human photopic CSF:
+   $$\text{MTFa}(V) = \frac{\sum_{k=1}^K w_{\text{CSF}}(f_k) \cdot \text{MTF}_{\text{opt}}(16.7 f_k; V)}{\sum_{k=1}^K w_{\text{CSF}}(f_k)}$$
 
-### 6.2 Psychophysical Basis & Formula
-Human visual perception does not function like a passive linear CCD sensor. Spatial vision is governed by **neural contrast constancy** and cortical receptive fields (Campbell & Robson 1968, Watson 2000, Charman 1991):
-1. Retinal ganglion cells and V1 cortical simple cells act as bandpass spatial frequency filters tuned to high-frequency edges.
-2. The diffuse low-frequency background veil formed by out-of-focus orders is adapted out as background DC illumination.
-3. The in-focus focal order ($|\Delta D| \le 0.45\,\text{D}$) dominates edge detection and fine letter recognition.
+2. **Visual Acuity Power-Law Prediction:**
+   $$\text{VA}_{\text{opt}}(V) = \alpha \cdot [\max(\text{MTFa}(V), \epsilon)]^{-\beta} + \gamma$$
+   with $\alpha = 0.085, \beta = 0.72, \gamma = -0.175$ (calibrated against FDA PMA clinical cohorts, Alarcon et al. 2016 JBO).
 
-In the simulator, an effective foveal neural gain $G_{\text{neural}}$ is applied to in-focus focal components:
-$$G_{\text{neural}}(\Delta D) = \begin{cases} 1 + 2.5 \cdot \cos\left(\frac{\pi}{2} \cdot \frac{|\Delta D|}{0.45}\right), & |\Delta D| \le 0.45\,\text{D} \\ 1.0, & |\Delta D| > 0.45\,\text{D} \end{cases}$$
-
-This preserves the true physical PSF morphology (diffractive rings and halo diameter for distant point lights) while ensuring that near text remains crisp and legible for trifocals, but completely blurred for monofocals.
+3. **Clinical-Optical Reconciliation Operator:**
+   In `psfForLayer`, the physical wave-optics kernel $K_{\text{opt}}$ is reconciled with verified clinical defocus data $VA_{\text{clin}}(V)$:
+   - For sharp in-focus clinical vision ($VA_{\text{clin}} \le 0.25\text{ logMAR}$), the central diffraction core is sharpened by $S_{\text{target}}/S_{\text{opt}} = \min(3.5, 1.25 / \text{MAR}_{\text{clin}})$, reproducing clinical reading legibility.
+   - For out-of-focus vision ($VA_{\text{clin}} > 0.35\text{ logMAR}$), the optical blur diameter is constrained to match clinical $\text{MAR}_{\text{clin}} = 10^{VA_{\text{clin}}}$.
+   - **Point-Light Preservation:** Night light sources ($c_{\text{Emissive}}$) use the unmodified scalar diffraction kernel $K_{\text{physical}}$ to preserve physical halo rings, diffractive orders, and pupil apodization.
 
 ---
 
 ## 7. Doctor's Lens Portfolio Mapping
 
-The simulator maps 1:1 to the 6 clinical categories specified by the clinician:
+The simulator provides 9 selectable profiles covering the complete spectrum of modern cataract surgical choices:
 
 | Index | Category | Clinical Lens Representative | Primary Optical Mechanism |
 |---|---|---|---|
-| **0** | **Natural Eye (Reference)** | Phakic accommodating eye | Dynamic crystalline accommodation ($0.0\,\text{D}$ defocus across all distances) |
+| **0** | **Natural Eye (Reference)** | Phakic accommodating eye | Dynamic crystalline accommodation ($0.0\,\text{D}$ residual defocus across all distances) |
 | **1** | **Monofocal** | Alcon Clareon / AcrySof SN60WF | Single distance focus; sharp far, heavy intermediate & near blur |
-| **2** | **EDOF** | TECNIS Symfony ZXR00 | Diffractive echelette elongating focus by $+1.75\,\text{D}$ |
-| **3a** | **Premium EDOF (PureSee)** | Johnson & Johnson TECNIS PureSee | Continuous refractive wavefront shaping; zero diffractive halo rings |
-| **3b** | **Premium EDOF (Vivity)** | Alcon AcrySof IQ Vivity | Non-diffractive X-WAVE™ wavefront elevation |
-| **4** | **Multifocal** | Half-wave kinoform bifocal | Twin foci at $0\,\text{D}$ and $+2.50\,\text{D}$; intermediate gap |
-| **5** | **Trifocal Lenses** | Alcon PanOptix TFNT00 | Quadrifocal design with dedicated $+1.68\,\text{D}$ (60 cm) & $+2.51\,\text{D}$ (40 cm) peaks |
-| **6** | **Imported Trifocal** | Zeiss AT LISA tri 839MP | Apodized diffractive steps reducing halo ring luminance by $\approx 45\%$ |
+| **2** | **Tier-1 EDOF** | Johnson & Johnson TECNIS Eyhance (ICB00) | Continuous higher-order aspheric surface OPD progression (+0.65 D) |
+| **3** | **Diffractive EDOF** | TECNIS Symfony ZXR00 | Diffractive echelette elongating focus by $+1.75\,\text{D}$ |
+| **4a** | **Premium EDOF (PureSee)** | Johnson & Johnson TECNIS PureSee | Continuous refractive wavefront shaping; zero diffractive halo rings |
+| **4b** | **Premium EDOF (Vivity)** | Alcon AcrySof IQ Vivity | Non-diffractive X-WAVE™ wavefront elevation |
+| **5** | **Multifocal** | Half-wave kinoform bifocal | Twin foci at $0\,\text{D}$ and $+2.50\,\text{D}$; intermediate gap |
+| **6** | **Trifocal Lenses** | Alcon PanOptix TFNT00 | Quadrifocal design with dedicated $+1.68\,\text{D}$ (60 cm) & $+2.51\,\text{D}$ (40 cm) peaks |
+| **7** | **Imported Trifocal** | Zeiss AT LISA tri 839MP | Apodized diffractive steps reducing halo ring luminance at mesopic pupils |
 | **Ref** | **Aphakic Eye (+11D)** | Natural lens removed, no IOL | Surgical uncorrected baseline ($+11\,\text{D}$ spectacle defocus) |
 
 ---

@@ -22,6 +22,8 @@ yarn-error.log*
 crop_*.png
 *.log
 *.tsbuildinfo
+*.zip
+*_codebase.txt
 
 # OS & IDE
 .DS_Store

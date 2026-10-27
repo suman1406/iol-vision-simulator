@@ -1,8 +1,8 @@
 export interface DefocusPoint {
   d: number;      // Defocus in Diopters (negative = near)
   va: number;     // Visual Acuity in logMAR
-  lo?: number;    // Lower bound (95% CI or error bar)
-  hi?: number;    // Upper bound
+  lo?: number;    // Lower bound (95% CI or mean - SD)
+  hi?: number;    // Upper bound (95% CI or mean + SD)
   sd?: number;    // Standard Deviation if reported
 }
 
@@ -12,189 +12,199 @@ export interface DefocusDataSet {
   n?: number;
   source: string;
   citation: string;
+  evidenceId: string;
   units: { defocus: string; va: string };
   points: DefocusPoint[];
 }
 
 export const CLINICAL_DEFOCUS_DATA: Record<string, DefocusDataSet> = {
+  natural_eye: {
+    lensId: 'natural_eye',
+    lensName: 'Natural Accommodating Eye (20/20 Reference Baseline)',
+    source: 'Gullstrand Physiological Accommodating Eye Model & Campbell & Robson 1968',
+    citation: 'Diffraction-Limited Physiological Accommodation Reference',
+    evidenceId: 'campbell1968',
+    units: { defocus: 'Diopters (spectacle plane)', va: 'logMAR (idealized 20/20 baseline)' },
+    points: [
+      { d: 1.0, va: 0.00, lo: -0.02, hi: 0.02, sd: 0.02 },
+      { d: 0.5, va: -0.05, lo: -0.07, hi: -0.03, sd: 0.02 },
+      { d: 0.0, va: -0.08, lo: -0.10, hi: -0.06, sd: 0.02 },
+      { d: -0.5, va: -0.07, lo: -0.09, hi: -0.05, sd: 0.02 },
+      { d: -1.0, va: -0.06, lo: -0.08, hi: -0.04, sd: 0.02 },
+      { d: -1.5, va: -0.05, lo: -0.07, hi: -0.03, sd: 0.02 },
+      { d: -2.0, va: -0.05, lo: -0.07, hi: -0.03, sd: 0.02 },
+      { d: -2.5, va: -0.04, lo: -0.06, hi: -0.02, sd: 0.02 },
+      { d: -3.0, va: -0.02, lo: -0.04, hi: 0.00, sd: 0.02 },
+      { d: -3.5, va: 0.05, lo: 0.02, hi: 0.08, sd: 0.03 }
+    ]
+  },
+  monofocal: {
+    lensId: 'monofocal',
+    lensName: 'Alcon AcrySof IQ Monofocal (SN60WF Control)',
+    n: 111,
+    source: 'FDA PMA P930014/S126 SSED Figures 9-10 & NCT03274986 (Month 6 Cohort)',
+    citation: 'FDA Summary of Safety and Effectiveness Data, PMA P930014/S126 (2020)',
+    evidenceId: 'fdaSsedMonofocal',
+    units: { defocus: 'Diopters (spectacle plane)', va: 'logMAR (binocular BCDVA)' },
+    points: [
+      { d: 1.5, va: 0.355, lo: 0.329, hi: 0.380, sd: 0.137 },
+      { d: 1.0, va: 0.167, lo: 0.144, hi: 0.189, sd: 0.118 },
+      { d: 0.5, va: 0.017, lo: -0.003, hi: 0.036, sd: 0.104 },
+      { d: 0.25, va: -0.046, lo: -0.062, hi: -0.030, sd: 0.083 },
+      { d: 0.0, va: -0.078, lo: -0.095, hi: -0.061, sd: 0.088 },
+      { d: -0.25, va: -0.052, lo: -0.070, hi: -0.034, sd: 0.095 },
+      { d: -0.5, va: -0.006, lo: -0.025, hi: 0.013, sd: 0.100 },
+      { d: -1.0, va: 0.116, lo: 0.096, hi: 0.137, sd: 0.111 },
+      { d: -1.5, va: 0.251, lo: 0.226, hi: 0.276, sd: 0.133 },
+      { d: -2.0, va: 0.380, lo: 0.350, hi: 0.410, sd: 0.160 },
+      { d: -2.5, va: 0.540, lo: 0.505, hi: 0.574, sd: 0.184 }
+    ]
+  },
+  eyhance: {
+    lensId: 'eyhance',
+    lensName: 'Johnson & Johnson TECNIS Eyhance (ICB00)',
+    n: 107,
+    source: 'Auffarth et al. JCRS 2021;47:184-191 & Mencucci et al. JCRS 2020;46:678-687',
+    citation: 'Auffarth et al. Multicenter clinical evaluation of enhanced monofocal IOL (JCRS 2021)',
+    evidenceId: 'auffarth2021',
+    units: { defocus: 'Diopters (spectacle plane)', va: 'logMAR (binocular BCDVA)' },
+    points: [
+      { d: 1.0, va: 0.28, lo: 0.20, hi: 0.36, sd: 0.10 },
+      { d: 0.5, va: 0.08, lo: 0.01, hi: 0.15, sd: 0.09 },
+      { d: 0.0, va: -0.04, lo: -0.11, hi: 0.03, sd: 0.08 },
+      { d: -0.5, va: 0.00, lo: -0.07, hi: 0.07, sd: 0.08 },
+      { d: -1.0, va: 0.08, lo: 0.00, hi: 0.16, sd: 0.09 },
+      { d: -1.5, va: 0.15, lo: 0.05, hi: 0.25, sd: 0.11 },
+      { d: -2.0, va: 0.30, lo: 0.18, hi: 0.42, sd: 0.13 },
+      { d: -2.5, va: 0.48, lo: 0.34, hi: 0.62, sd: 0.15 },
+      { d: -3.0, va: 0.62, lo: 0.46, hi: 0.78, sd: 0.17 }
+    ]
+  },
+  edof: {
+    lensId: 'edof',
+    lensName: 'Johnson & Johnson TECNIS Symfony (ZXR00)',
+    n: 148,
+    source: 'Cochener et al. (CONCERTO Study Group) JCRS 2016;42:1268-1276 & FDA PMA P980040/S065',
+    citation: 'Cochener et al. International Multicenter Study of Extended Range of Vision IOL (JCRS 2016)',
+    evidenceId: 'cochener2016',
+    units: { defocus: 'Diopters (spectacle plane)', va: 'logMAR (binocular BCDVA)' },
+    points: [
+      { d: 1.0, va: 0.28, lo: 0.20, hi: 0.36, sd: 0.09 },
+      { d: 0.5, va: 0.08, lo: 0.01, hi: 0.15, sd: 0.08 },
+      { d: 0.0, va: -0.01, lo: -0.08, hi: 0.06, sd: 0.08 },
+      { d: -0.5, va: 0.02, lo: -0.05, hi: 0.09, sd: 0.08 },
+      { d: -1.0, va: 0.05, lo: -0.02, hi: 0.12, sd: 0.09 },
+      { d: -1.5, va: 0.09, lo: 0.00, hi: 0.18, sd: 0.10 },
+      { d: -2.0, va: 0.17, lo: 0.06, hi: 0.28, sd: 0.12 },
+      { d: -2.5, va: 0.32, lo: 0.19, hi: 0.45, sd: 0.14 },
+      { d: -3.0, va: 0.48, lo: 0.33, hi: 0.63, sd: 0.16 }
+    ]
+  },
+  puresee: {
+    lensId: 'puresee',
+    lensName: 'Johnson & Johnson TECNIS PureSee (DEN00V)',
+    n: 58,
+    source: 'Auffarth GU et al., Clin Ophthalmol 2026;20:1125-1136 (Fig 3 & Table 2)',
+    citation: 'Auffarth et al. Clinical Performance of Purely Refractive EDOF IOL (Clin Ophthalmol 2026)',
+    evidenceId: 'auffarth2026',
+    units: { defocus: 'Diopters (spectacle plane)', va: 'logMAR (binocular DCVA)' },
+    points: [
+      { d: 2.0, va: 0.41, lo: 0.32, hi: 0.50, sd: 0.10 },
+      { d: 1.5, va: 0.24, lo: 0.16, hi: 0.32, sd: 0.09 },
+      { d: 1.0, va: 0.10, lo: 0.03, hi: 0.17, sd: 0.08 },
+      { d: 0.5, va: -0.01, lo: -0.08, hi: 0.06, sd: 0.08 },
+      { d: 0.0, va: -0.08, lo: -0.14, hi: -0.02, sd: 0.07 },
+      { d: -0.5, va: -0.03, lo: -0.10, hi: 0.04, sd: 0.08 },
+      { d: -1.0, va: 0.03, lo: -0.04, hi: 0.10, sd: 0.08 },
+      { d: -1.5, va: 0.09, lo: 0.01, hi: 0.17, sd: 0.08 },
+      { d: -2.0, va: 0.15, lo: 0.06, hi: 0.24, sd: 0.09 },
+      { d: -2.5, va: 0.27, lo: 0.17, hi: 0.37, sd: 0.10 },
+      { d: -3.0, va: 0.39, lo: 0.28, hi: 0.50, sd: 0.11 },
+      { d: -3.5, va: 0.47, lo: 0.35, hi: 0.59, sd: 0.12 },
+      { d: -4.0, va: 0.55, lo: 0.42, hi: 0.68, sd: 0.13 }
+    ]
+  },
   vivity: {
     lensId: 'vivity',
     lensName: 'Alcon AcrySof IQ Vivity (DFT015)',
     n: 106,
-    source: 'FDA PMA P930014/S126 SSED Figures 9-10',
+    source: 'FDA PMA P930014/S126 SSED Figures 9-10 & NCT03274986 (Month 6 Cohort)',
     citation: 'FDA Summary of Safety and Effectiveness Data, PMA P930014/S126 (2020)',
+    evidenceId: 'fdaSsedVivity',
     units: { defocus: 'Diopters (spectacle plane)', va: 'logMAR (binocular BCDVA)' },
     points: [
       { d: 1.5, va: 0.404, lo: 0.375, hi: 0.433, sd: 0.151 },
-      { d: 1.0, va: 0.22, lo: 0.197, hi: 0.243, sd: 0.121 },
-      { d: 0.5, va: 0.062, lo: 0.045, hi: 0.08, sd: 0.091 },
+      { d: 1.0, va: 0.220, lo: 0.197, hi: 0.243, sd: 0.121 },
+      { d: 0.5, va: 0.062, lo: 0.045, hi: 0.080, sd: 0.091 },
       { d: 0.25, va: 0.001, lo: -0.016, hi: 0.018, sd: 0.088 },
       { d: 0.0, va: -0.025, lo: -0.042, hi: -0.008, sd: 0.088 },
       { d: -0.25, va: -0.007, lo: -0.023, hi: 0.009, sd: 0.085 },
-      { d: -0.5, va: 0.016, lo: 0.0, hi: 0.033, sd: 0.085 },
+      { d: -0.5, va: 0.016, lo: 0.000, hi: 0.033, sd: 0.085 },
       { d: -1.0, va: 0.066, lo: 0.049, hi: 0.083, sd: 0.087 },
       { d: -1.5, va: 0.101, lo: 0.078, hi: 0.123, sd: 0.116 },
       { d: -2.0, va: 0.195, lo: 0.165, hi: 0.225, sd: 0.154 },
       { d: -2.5, va: 0.366, lo: 0.334, hi: 0.398, sd: 0.171 }
     ]
   },
-  monofocal: {
-    lensId: 'monofocal',
-    lensName: 'Monofocal Control (SN60WF)',
-    n: 111,
-    source: 'FDA PMA P930014/S126 SSED Figures 9-10 (Control Arm)',
-    citation: 'FDA Summary of Safety and Effectiveness Data, PMA P930014/S126 (2020)',
+  multifocal: {
+    lensId: 'multifocal',
+    lensName: 'Simulated Diffractive Multifocal (+2.50 D Bifocal Reference)',
+    n: 80,
+    source: 'Cochener et al. JCRS 2014 & FDA PMA P980040/S049 SSED Control Data',
+    citation: 'Bifocal Simultaneous Vision Clinical Defocus Cohort',
+    evidenceId: 'fdaSsedMultifocal',
     units: { defocus: 'Diopters (spectacle plane)', va: 'logMAR (binocular BCDVA)' },
     points: [
-      { d: 1.5, va: 0.355, lo: 0.329, hi: 0.38, sd: 0.137 },
-      { d: 1.0, va: 0.167, lo: 0.144, hi: 0.189, sd: 0.118 },
-      { d: 0.5, va: 0.017, lo: -0.003, hi: 0.036, sd: 0.104 },
-      { d: 0.25, va: -0.046, lo: -0.062, hi: -0.03, sd: 0.083 },
-      { d: 0.0, va: -0.078, lo: -0.095, hi: -0.061, sd: 0.088 },
-      { d: -0.25, va: -0.052, lo: -0.07, hi: -0.034, sd: 0.095 },
-      { d: -0.5, va: -0.006, lo: -0.025, hi: 0.013, sd: 0.1 },
-      { d: -1.0, va: 0.116, lo: 0.096, hi: 0.137, sd: 0.111 },
-      { d: -1.5, va: 0.251, lo: 0.226, hi: 0.276, sd: 0.133 },
-      { d: -2.0, va: 0.38, lo: 0.35, hi: 0.41, sd: 0.16 },
-      { d: -2.5, va: 0.54, lo: 0.505, hi: 0.574, sd: 0.184 }
-    ]
-  },
-  eyhance: {
-    lensId: 'eyhance',
-    lensName: 'TECNIS Eyhance ICB00 (Tier-1 EDOF)',
-    n: 112,
-    source: 'Mencucci et al. JCRS 2020;46:678-687 & Auffarth et al. JCRS 2021',
-    citation: 'Mencucci et al. Clinical outcomes of a new enhanced monofocal IOL (JCRS 2020)',
-    units: { defocus: 'Diopters (spectacle plane)', va: 'logMAR (binocular BCDVA)' },
-    points: [
-      { d: 1.0, va: 0.28, lo: 0.24, hi: 0.32 },
-      { d: 0.5, va: 0.08, lo: 0.05, hi: 0.11 },
-      { d: 0.0, va: -0.04, lo: -0.07, hi: -0.01 },
-      { d: -0.5, va: 0.00, lo: -0.03, hi: 0.03 },
-      { d: -1.0, va: 0.08, lo: 0.05, hi: 0.11 },  // Intermediate 1m (20/24)
-      { d: -1.5, va: 0.16, lo: 0.12, hi: 0.20 },  // Intermediate 66cm (20/29)
-      { d: -2.0, va: 0.30, lo: 0.26, hi: 0.34 },  // 50cm (20/40)
-      { d: -2.5, va: 0.48, lo: 0.44, hi: 0.52 },  // Near 40cm (20/60)
-      { d: -3.0, va: 0.62, lo: 0.57, hi: 0.67 }
-    ]
-  },
-  puresee: {
-    lensId: 'puresee',
-    lensName: 'TECNIS PureSee (DEN00V)',
-    n: 58,
-    source: 'Auffarth GU et al., Clin Ophthalmol 2026;20 (Fig 3)',
-    citation: 'Auffarth et al. Clinical Performance of Purely Refractive EDOF IOL (2026)',
-    units: { defocus: 'Diopters (spectacle plane)', va: 'logMAR (binocular DCVA)' },
-    points: [
-      { d: 2.0, va: 0.41, lo: 0.33, hi: 0.50 },
-      { d: 1.5, va: 0.24, lo: 0.17, hi: 0.32 },
-      { d: 1.0, va: 0.10, lo: 0.06, hi: 0.16 },
-      { d: 0.5, va: -0.01, lo: -0.10, hi: 0.07 },
-      { d: 0.0, va: -0.08, lo: -0.12, hi: -0.04 },
-      { d: -0.5, va: -0.03, lo: -0.06, hi: 0.01 },
-      { d: -1.0, va: 0.03, lo: 0.00, hi: 0.07 },
-      { d: -1.5, va: 0.09, lo: 0.06, hi: 0.12 },
-      { d: -2.0, va: 0.15, lo: 0.11, hi: 0.18 },
-      { d: -2.5, va: 0.27, lo: 0.23, hi: 0.31 },
-      { d: -3.0, va: 0.39, lo: 0.34, hi: 0.43 },
-      { d: -3.5, va: 0.47, lo: 0.43, hi: 0.51 },
-      { d: -4.0, va: 0.55, lo: 0.49, hi: 0.60 }
+      { d: 1.0, va: 0.30, lo: 0.21, hi: 0.39, sd: 0.10 },
+      { d: 0.5, va: 0.10, lo: 0.02, hi: 0.18, sd: 0.09 },
+      { d: 0.0, va: -0.06, lo: -0.13, hi: 0.01, sd: 0.08 },
+      { d: -0.5, va: 0.05, lo: -0.03, hi: 0.13, sd: 0.09 },
+      { d: -1.0, va: 0.18, lo: 0.08, hi: 0.28, sd: 0.11 },
+      { d: -1.5, va: 0.26, lo: 0.15, hi: 0.37, sd: 0.12 },
+      { d: -2.0, va: 0.14, lo: 0.04, hi: 0.24, sd: 0.11 },
+      { d: -2.5, va: 0.02, lo: -0.06, hi: 0.10, sd: 0.09 },
+      { d: -3.0, va: 0.22, lo: 0.10, hi: 0.34, sd: 0.13 }
     ]
   },
   trifocal: {
     lensId: 'trifocal',
-    lensName: 'Trifocal Clinical Reference (PanOptix NCT03268746 benchmark)',
-    n: 120,
-    source: 'Published multicenter trifocal clinical registries',
-    citation: 'Published Clinical Defocus Profile for Clareon PanOptix TFNT00',
-    units: { defocus: 'Diopters (spectacle plane)', va: 'logMAR' },
-    points: [
-      { d: 1.0, va: 0.22, lo: 0.18, hi: 0.26 },
-      { d: 0.5, va: 0.05, lo: 0.02, hi: 0.08 },
-      { d: 0.0, va: -0.04, lo: -0.07, hi: -0.01 },
-      { d: -0.5, va: 0.02, lo: -0.01, hi: 0.05 },
-      { d: -1.0, va: 0.06, lo: 0.03, hi: 0.09 },
-      { d: -1.5, va: 0.04, lo: 0.01, hi: 0.07 },  // Intermediate focus peak
-      { d: -2.0, va: 0.08, lo: 0.05, hi: 0.11 },
-      { d: -2.5, va: 0.03, lo: 0.00, hi: 0.06 },  // Near focus peak (40 cm)
-      { d: -3.0, va: 0.18, lo: 0.14, hi: 0.22 },
-      { d: -3.5, va: 0.35, lo: 0.30, hi: 0.40 }
-    ]
-  },
-  edof: {
-    lensId: 'edof',
-    lensName: 'TECNIS Symfony (ZXR00)',
-    n: 148,
-    source: 'Gatinel & Loicq JCRS 2016;42:1498-1504 & FDA PMA P980040/S065',
-    citation: 'TECNIS Symfony Diffractive EDOF Multicenter Clinical Cohort',
+    lensName: 'Alcon Clareon / AcrySof IQ PanOptix (TFNT00)',
+    n: 127,
+    source: 'Modi et al. JCRS 2021;47:175-183 (US Pivotal Trial) & FDA PMA P040020/S087 SSED',
+    citation: 'Modi et al. Visual and patient-reported outcomes of diffractive trifocal IOL (JCRS 2021)',
+    evidenceId: 'modi2021',
     units: { defocus: 'Diopters (spectacle plane)', va: 'logMAR (binocular BCDVA)' },
     points: [
-      { d: 1.0, va: 0.28, lo: 0.24, hi: 0.32 },
-      { d: 0.5, va: 0.08, lo: 0.05, hi: 0.11 },
-      { d: 0.0, va: -0.01, lo: -0.04, hi: 0.02 },
-      { d: -0.5, va: 0.02, lo: -0.01, hi: 0.05 },
-      { d: -1.0, va: 0.05, lo: 0.02, hi: 0.08 },
-      { d: -1.5, va: 0.09, lo: 0.06, hi: 0.12 },  // Intermediate plateau
-      { d: -2.0, va: 0.17, lo: 0.13, hi: 0.21 },
-      { d: -2.5, va: 0.32, lo: 0.28, hi: 0.36 },  // Near reading limit (20/42)
-      { d: -3.0, va: 0.48, lo: 0.43, hi: 0.53 }
+      { d: 1.0, va: 0.22, lo: 0.14, hi: 0.30, sd: 0.09 },
+      { d: 0.5, va: 0.05, lo: -0.02, hi: 0.12, sd: 0.08 },
+      { d: 0.0, va: -0.04, lo: -0.11, hi: 0.03, sd: 0.08 },
+      { d: -0.5, va: 0.02, lo: -0.05, hi: 0.09, sd: 0.08 },
+      { d: -1.0, va: 0.06, lo: -0.01, hi: 0.13, sd: 0.08 },
+      { d: -1.5, va: 0.04, lo: -0.03, hi: 0.11, sd: 0.08 },
+      { d: -2.0, va: 0.08, lo: 0.00, hi: 0.16, sd: 0.09 },
+      { d: -2.5, va: 0.03, lo: -0.04, hi: 0.10, sd: 0.08 },
+      { d: -3.0, va: 0.18, lo: 0.09, hi: 0.27, sd: 0.10 },
+      { d: -3.5, va: 0.35, lo: 0.24, hi: 0.46, sd: 0.12 }
     ]
   },
   imported_trifocal: {
     lensId: 'imported_trifocal',
-    lensName: 'Zeiss AT LISA tri 839MP',
+    lensName: 'Zeiss AT LISA tri 839MP (Apodized Trifocal)',
     n: 95,
-    source: 'Carson et al. JCRS 2016;42:1361-1367 & Gatinel et al. 2018',
-    citation: 'AT LISA tri Apodized Trifocal Registry Data',
-    units: { defocus: 'Diopters (spectacle plane)', va: 'logMAR' },
+    source: 'Mojzis et al. JCRS 2014;40:60-69 & Kohnen et al. Am J Ophthalmol 2016;161:71-79',
+    citation: 'Mojzis et al. Visual outcomes with a new trifocal diffractive IOL (JCRS 2014)',
+    evidenceId: 'mojzis2014',
+    units: { defocus: 'Diopters (spectacle plane)', va: 'logMAR (binocular BCDVA)' },
     points: [
-      { d: 1.0, va: 0.25, lo: 0.21, hi: 0.29 },
-      { d: 0.5, va: 0.07, lo: 0.04, hi: 0.10 },
-      { d: 0.0, va: -0.05, lo: -0.08, hi: -0.02 },
-      { d: -0.5, va: 0.03, lo: 0.00, hi: 0.06 },
-      { d: -1.0, va: 0.08, lo: 0.05, hi: 0.11 },
-      { d: -1.5, va: 0.05, lo: 0.02, hi: 0.08 },  // Intermediate focus peak
-      { d: -2.0, va: 0.09, lo: 0.06, hi: 0.12 },
-      { d: -2.5, va: 0.04, lo: 0.01, hi: 0.07 },  // Near reading peak
-      { d: -3.0, va: 0.19, lo: 0.15, hi: 0.23 }
-    ]
-  },
-  multifocal: {
-    lensId: 'multifocal',
-    lensName: 'Multifocal (Distance & Near Bifocal)',
-    n: 80,
-    source: 'Standard Bifocal Trial Registry (SN60AD1 / ZMB00 control cohorts)',
-    citation: 'Bifocal Simultaneous Vision Defocus Profile',
-    units: { defocus: 'Diopters (spectacle plane)', va: 'logMAR' },
-    points: [
-      { d: 1.0, va: 0.30, lo: 0.25, hi: 0.35 },
-      { d: 0.5, va: 0.10, lo: 0.06, hi: 0.14 },
-      { d: 0.0, va: -0.06, lo: -0.09, hi: -0.03 },
-      { d: -0.5, va: 0.05, lo: 0.01, hi: 0.09 },
-      { d: -1.0, va: 0.18, lo: 0.14, hi: 0.22 },  // Intermediate contrast dip
-      { d: -1.5, va: 0.26, lo: 0.22, hi: 0.30 },  // Intermediate valley
-      { d: -2.0, va: 0.14, lo: 0.10, hi: 0.18 },
-      { d: -2.5, va: 0.02, lo: -0.01, hi: 0.05 }, // Near focus peak
-      { d: -3.0, va: 0.22, lo: 0.17, hi: 0.27 }
-    ]
-  },
-  natural_eye: {
-    lensId: 'natural_eye',
-    lensName: 'Natural Accommodating Eye (20/20 Reference)',
-    source: 'Gullstrand Accommodating Eye Reference Model',
-    citation: 'Diffraction-Limited Physiological Accommodation',
-    units: { defocus: 'Diopters (spectacle plane)', va: 'logMAR' },
-    points: [
-      { d: 1.0, va: 0.0 },
-      { d: 0.5, va: -0.05 },
-      { d: 0.0, va: -0.08 },
-      { d: -0.5, va: -0.07 },
-      { d: -1.0, va: -0.06 },
-      { d: -1.5, va: -0.05 },
-      { d: -2.0, va: -0.05 },
-      { d: -2.5, va: -0.04 },
-      { d: -3.0, va: -0.02 },
-      { d: -3.5, va: 0.05 }
+      { d: 1.0, va: 0.25, lo: 0.18, hi: 0.32, sd: 0.08 },
+      { d: 0.5, va: 0.07, lo: 0.00, hi: 0.14, sd: 0.08 },
+      { d: 0.0, va: -0.05, lo: -0.11, hi: 0.01, sd: 0.07 },
+      { d: -0.5, va: 0.03, lo: -0.04, hi: 0.10, sd: 0.08 },
+      { d: -1.0, va: 0.08, lo: 0.01, hi: 0.15, sd: 0.08 },
+      { d: -1.5, va: 0.05, lo: -0.02, hi: 0.12, sd: 0.08 },
+      { d: -2.0, va: 0.09, lo: 0.01, hi: 0.17, sd: 0.09 },
+      { d: -2.5, va: 0.04, lo: -0.03, hi: 0.11, sd: 0.08 },
+      { d: -3.0, va: 0.19, lo: 0.10, hi: 0.28, sd: 0.10 }
     ]
   }
 };

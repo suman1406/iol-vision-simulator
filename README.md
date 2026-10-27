@@ -135,11 +135,18 @@ Detailed optical derivations, Zernike polynomial tables, Fresnel-Kirchhoff scala
 
 ## Q1 Peer-Reviewed Literature Citations
 
-1. **Carson et al. (2016):** *"Optical bench performance of a novel trifocal intraocular lens compared with a multifocal lens."* *Journal of Cataract & Refractive Surgery*, 42(9):1361–1367. [DOI: 10.1016/j.jcrs.2016.07.030](https://doi.org/10.1016/j.jcrs.2016.07.030)
-2. **Schmid & Borkenstein (2024):** *"Optical Performance and Defocus Profiles of a New Pure Refractive Extended Depth of Focus Intraocular Lens."* *Clinical Ophthalmology*, 18:1921–1932. [DOI: 10.2147/OPTH.S470409](https://doi.org/10.2147/OPTH.S470409)
-3. **Garzón et al. (2024):** *"Defocus profile characterization of a non-diffractive wavefront-shaping extended depth-of-focus intraocular lens using phase-shifting deflectometry."* *Graefe's Archive for Clinical and Experimental Ophthalmology*, 262:2897–2906. [DOI: 10.1007/s00417-024-06484-8](https://doi.org/10.1007/s00417-024-06484-8)
-4. **Gatinel & Loicq (2016):** *"Computation, optical bench evaluation, and theoretical performance of the AcrySof IQ ReSTOR, TECNIS Symfony, and AT LISA tri intraocular lenses."* *Journal of Cataract & Refractive Surgery*, 42(10):1498–1504. [DOI: 10.1016/j.jcrs.2016.07.039](https://doi.org/10.1016/j.jcrs.2016.07.039)
-5. **Campbell & Robson (1968):** *"Application of Fourier analysis to the visibility of gratings."* *The Journal of Physiology*, 197(3):551–566.
+1. **Carson et al. (2016):** *"Optical bench performance of 3 trifocal intraocular lenses."* *Journal of Cataract & Refractive Surgery*, 42(9):1361–1367. [DOI: 10.1016/j.jcrs.2016.06.036](https://doi.org/10.1016/j.jcrs.2016.06.036)
+2. **Schmid & Borkenstein (2024):** *"Optical Bench Evaluation of the Latest Refractive Enhanced Depth of Focus Intraocular Lens."* *Clinical Ophthalmology*, 18:1921–1932. [DOI: 10.2147/OPTH.S469849](https://doi.org/10.2147/OPTH.S469849)
+3. **Garzón et al. (2024):** *"Optical power profiles and aberrations of a non-diffractive wavefront-shaping extended depth of focus intraocular lens."* *Graefe's Archive for Clinical and Experimental Ophthalmology*, 262(9):2897–2906. [DOI: 10.1007/s00417-024-06469-y](https://doi.org/10.1007/s00417-024-06469-y)
+4. **Gatinel & Loicq (2016):** *"Comparison of the through-focus optical quality of diffractive trifocal and extended depth of focus intraocular lenses."* *Journal of Cataract & Refractive Surgery*, 42(10):1498–1504. [DOI: 10.1016/j.jcrs.2016.08.019](https://doi.org/10.1016/j.jcrs.2016.08.019)
+5. **Auffarth et al. (2021):** *"Clinical evaluation of a new monofocal IOL with enhanced intermediate function in cataract patients."* *Journal of Cataract & Refractive Surgery*, 47(2):184–191. [DOI: 10.1097/j.jcrs.0000000000000399](https://doi.org/10.1097/j.jcrs.0000000000000399)
+6. **Mencucci et al. (2020):** *"Clinical outcomes, visual quality, and patient satisfaction with a new extended depth-of-focus monofocal intraocular lens."* *Journal of Cataract & Refractive Surgery*, 46(5):678–687. [DOI: 10.1097/j.jcrs.0000000000000142](https://doi.org/10.1097/j.jcrs.0000000000000142)
+7. **Cochener et al. (2016):** *"Clinical outcomes of a new extended range of vision intraocular lens: International Multicenter Study."* *Journal of Cataract & Refractive Surgery*, 42(9):1268–1276. [DOI: 10.1016/j.jcrs.2016.06.033](https://doi.org/10.1016/j.jcrs.2016.06.033)
+8. **Modi et al. (2021):** *"Visual and patient-reported outcomes of a diffractive trifocal intraocular lens: Results of the pivotal US clinical trial."* *Journal of Cataract & Refractive Surgery*, 47(2):175–183. [DOI: 10.1097/j.jcrs.0000000000000408](https://doi.org/10.1097/j.jcrs.0000000000000408)
+9. **Mojzis et al. (2014):** *"Visual outcomes and contrast sensitivity with a new trifocal diffractive intraocular lens."* *Journal of Cataract & Refractive Surgery*, 40(1):60–69. [DOI: 10.1016/j.jcrs.2013.06.025](https://doi.org/10.1016/j.jcrs.2013.06.025)
+10. **Auffarth et al. (2026):** *"Clinical Performance After Implantation of a New Purely Refractive Extended Depth of Field Intraocular Lens in Cataract Patients."* *Clinical Ophthalmology*, 20:1125–1136. [DOI: 10.2147/OPTH.S583059](https://doi.org/10.2147/OPTH.S583059)
+11. **Alarcon et al. (2016):** *"Prediction of visual acuity through focus in eyes implanted with intraocular lenses."* *Journal of Biomedical Optics*, 21(7):076013. [DOI: 10.1117/1.JBO.21.7.076013](https://doi.org/10.1117/1.JBO.21.7.076013)
+12. **Campbell & Robson (1968):** *"Application of Fourier analysis to the visibility of gratings."* *The Journal of Physiology*, 197(3):551–566. [DOI: 10.1113/jphysiol.1968.sp008574](https://doi.org/10.1113/jphysiol.1968.sp008574)
 
 ---
 

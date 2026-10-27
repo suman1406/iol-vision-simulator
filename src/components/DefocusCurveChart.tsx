@@ -148,7 +148,7 @@ export const DefocusCurveChart: React.FC<DefocusCurveChartProps> = ({
               ? 'Near (40cm / -2.50D)'
               : isIntermediate
               ? 'Int (85cm / -1.18D)'
-              : 'Far (10m / 0.0D)';
+              : 'Far (10m / -0.10D)';
 
             return (
               <g key={layer.id}>

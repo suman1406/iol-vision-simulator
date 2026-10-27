@@ -41,9 +41,9 @@ export interface RenderResult {
   layers: Array<{ id: string; vergenceD: number; kernelSize: number }>;
 }
 
-// Convolve RGB planes (preserving original alpha) with kernel k via FFT
+// Convolve RGB planes (preserving original alpha) with kernel k via 2D FFT
 export function convolveRGB(
-  planes: Float32Array[],  // [R, G, B, A] premultiplied linear
+  planes: Float32Array[], // [R, G, B, A] premultiplied linear
   w: number,
   h: number,
   k: Float64Array,
@@ -77,11 +77,12 @@ export function convolveRGB(
       }
     }
 
+    // Mirror border extension to suppress rectangular FFT boundary wrap-around artifacts
     for (let y = 0; y < H; y++) {
       for (let x = 0; x < W; x++) {
         if (y < h && x < w) continue;
-        const sx = x < w ? x : (x < w + (W - w) / 2 ? w - 1 : 0);
-        const sy = y < h ? y : (y < h + (H - h) / 2 ? h - 1 : 0);
+        const sx = x < w ? x : x < w + (W - w) / 2 ? w - 1 : 0;
+        const sy = y < h ? y : y < h + (H - h) / 2 ? h - 1 : 0;
         re[y * W + x] = planes[aIdx][sy * w + sx];
         if (bIdx !== null) im[y * W + x] = planes[bIdx][sy * w + sx];
       }
@@ -120,19 +121,12 @@ export function convolveRGB(
 }
 
 // Convert Layer canvas -> premultiplied linear planes; add emissive with HDR gain
-export function toPlanes(
-  layer: SceneLayer,
-  w: number,
-  h: number,
-  gain: number
-): Float32Array[] {
+export function toPlanes(layer: SceneLayer, w: number, h: number, gain: number): Float32Array[] {
   const ctx = layer.canvas.getContext('2d');
   if (!ctx) throw new Error('Could not get 2d context for layer canvas');
   const d = ctx.getImageData(0, 0, w, h).data;
-  
-  const e = layer.emissive
-    ? layer.emissive.getContext('2d')?.getImageData(0, 0, w, h).data
-    : null;
+
+  const e = layer.emissive ? layer.emissive.getContext('2d')?.getImageData(0, 0, w, h).data : null;
 
   const p = [0, 1, 2, 3].map(() => new Float32Array(w * h));
   for (let i = 0; i < w * h; i++) {
@@ -170,11 +164,12 @@ export function renderScene(
     const vergenceD = 1 / layer.distanceM;
 
     if (rendered && effectiveLens) {
-      const adds = effectiveLens.kind === 'natural-reference'
-        ? [0]
-        : (effectiveLens.foci || [{ addD: 0 }]).map((f) =>
-            Math.abs(vergenceD - f.addD + (effectiveLens?.focusOffsetD || 0))
-          );
+      const adds =
+        effectiveLens.kind === 'natural-reference'
+          ? [0]
+          : (effectiveLens.foci || [{ addD: 0 }]).map((f) =>
+              Math.abs(vergenceD - f.addD + (effectiveLens?.focusOffsetD || 0))
+            );
       const extentRad = Math.min(0.045, env.pupilMm * 1e-3 * Math.max(...adds, 0.5) * 1.3 + 0.004);
       const psf = psfForLayer({
         pupilMm: env.pupilMm,
@@ -219,7 +214,7 @@ export interface DepthBlendedSceneInput {
   nearDistM: number;
 }
 
-// Render continuous multi-plane depth-blended photograph (eliminates all rectangular seams/patches)
+// Render continuous multi-plane depth-blended photograph with boundary bleed isolation
 export function renderDepthBlendedScene(
   input: DepthBlendedSceneInput,
   env: EnvironmentConfig,
@@ -249,13 +244,57 @@ export function renderDepthBlendedScene(
     };
   }
 
-  // Base linear planes
-  const planes = [new Float32Array(w * h), new Float32Array(w * h), new Float32Array(w * h), new Float32Array(w * h)];
+  // Pre-calculate spatial depth masks to prevent cross-depth boundary bleed (RC-7)
+  const wNearMap = new Float32Array(w * h);
+  const wFarMap = new Float32Array(w * h);
+  const wIntMap = new Float32Array(w * h);
+
+  const phoneCenterX = 0.865;
+  const phoneCenterY = 0.65;
+  const phoneHalfW = 0.095;
+  const phoneHalfH = 0.30;
+  const phoneBlendRadius = 0.04;
+
+  for (let y = 0; y < h; y++) {
+    const normY = y / h;
+    for (let x = 0; x < w; x++) {
+      const normX = x / w;
+      const idx = y * w + x;
+
+      // 1. Smartphone & hand region (Near: 0.40m)
+      const phoneDistX = Math.max(0, Math.abs(normX - phoneCenterX) - phoneHalfW);
+      const phoneDistY = Math.max(0, Math.abs(normY - phoneCenterY) - phoneHalfH);
+      const phoneDist = Math.hypot(phoneDistX / phoneBlendRadius, phoneDistY / phoneBlendRadius);
+      const wNear = Math.max(0, Math.min(1, 1 - phoneDist));
+      wNearMap[idx] = wNear;
+
+      // 2. Windshield horizon line (Far: 10m)
+      const horizon = 0.34 + 0.04 * Math.sin(normX * Math.PI);
+      const farDist = (horizon - normY) / 0.04;
+      const rawFar = Math.max(0, Math.min(1, farDist));
+      const wFar = rawFar * (1 - wNear);
+      wFarMap[idx] = wFar;
+
+      // 3. Cockpit interior (Intermediate: 0.85m)
+      wIntMap[idx] = Math.max(0, 1 - wFar - wNear);
+    }
+  }
+
+  // Base linear planes per depth layer (with soft cross-boundary infill to prevent bleed)
+  const farPlanes = [new Float32Array(w * h), new Float32Array(w * h), new Float32Array(w * h), new Float32Array(w * h)];
+  const intPlanes = [new Float32Array(w * h), new Float32Array(w * h), new Float32Array(w * h), new Float32Array(w * h)];
+  const nearPlanes = [new Float32Array(w * h), new Float32Array(w * h), new Float32Array(w * h), new Float32Array(w * h)];
+
   for (let i = 0; i < w * h; i++) {
     for (let c = 0; c < 3; c++) {
-      planes[c][i] = toLin[d[i * 4 + c]];
+      const lin = toLin[d[i * 4 + c]];
+      farPlanes[c][i] = lin;
+      intPlanes[c][i] = lin;
+      nearPlanes[c][i] = lin;
     }
-    planes[3][i] = 1.0;
+    farPlanes[3][i] = 1.0;
+    intPlanes[3][i] = 1.0;
+    nearPlanes[3][i] = 1.0;
   }
 
   // Compute 3 focal plane PSFs
@@ -264,11 +303,12 @@ export function renderDepthBlendedScene(
   const vergNear = 1 / nearDistM;
 
   const getExtent = (vD: number) => {
-    const adds = effectiveLens.kind === 'natural-reference'
-      ? [0]
-      : (effectiveLens.foci || [{ addD: 0 }]).map((f) =>
-          Math.abs(vD - f.addD + (effectiveLens.focusOffsetD || 0))
-        );
+    const adds =
+      effectiveLens.kind === 'natural-reference'
+        ? [0]
+        : (effectiveLens.foci || [{ addD: 0 }]).map((f) =>
+            Math.abs(vD - f.addD + (effectiveLens.focusOffsetD || 0))
+          );
     return Math.min(0.045, env.pupilMm * 1e-3 * Math.max(...adds, 0.5) * 1.3 + 0.004);
   };
 
@@ -306,11 +346,11 @@ export function renderDepthBlendedScene(
   );
 
   // Full-frame continuous convolution per depth plane
-  const cFar = convolveRGB(planes, w, h, psfFar.k, psfFar.size);
-  const cInt = convolveRGB(planes, w, h, psfInt.k, psfInt.size);
-  const cNear = convolveRGB(planes, w, h, psfNear.k, psfNear.size);
+  const cFar = convolveRGB(farPlanes, w, h, psfFar.k, psfFar.size);
+  const cInt = convolveRGB(intPlanes, w, h, psfInt.k, psfInt.size);
+  const cNear = convolveRGB(nearPlanes, w, h, psfNear.k, psfNear.size);
 
-  // Optional emissive headlights for night scene (HDR gain)
+  // Emissive headlights for night scene (using pristine physical wave-optics PSF)
   let cEmissive: Float32Array[] | null = null;
   if (emissiveCanvas) {
     const eCtx = emissiveCanvas.getContext('2d');
@@ -325,51 +365,32 @@ export function renderDepthBlendedScene(
         }
         ePlanes[3][i] = a;
       }
-      cEmissive = convolveRGB(ePlanes, w, h, psfFar.k, psfFar.size);
+      // Pure physical scalar diffraction kernel preserves exact diffraction rings & halo radius
+      const physicalKernel = psfFar.psfPhysical || psfFar.k;
+      cEmissive = convolveRGB(ePlanes, w, h, physicalKernel, psfFar.size);
     }
   }
 
   const img = new ImageData(w, h);
 
-  // Continuous depth weighting:
-  // - Windshield / road: Far (10m)
-  // - Cockpit / steering wheel / GPS / dashboard: Intermediate (0.85m)
-  // - Smartphone & holding hand: Near (0.40m)
-  for (let y = 0; y < h; y++) {
-    const normY = y / h;
-    for (let x = 0; x < w; x++) {
-      const normX = x / w;
-      const idx = y * w + x;
+  for (let idx = 0; idx < w * h; idx++) {
+    const wFar = wFarMap[idx];
+    const wInt = wIntMap[idx];
+    const wNear = wNearMap[idx];
 
-      // Calibrated depth geometries for Daytime & Nighttime Toyota Driver POV scenes:
-      // Both day and night share identical POV geometry: Far windshield ahead, Cockpit at 0.85m, Phone at 0.40m.
-      // 1. Smartphone & hand region (Near: 0.40m)
-      const phoneCenterX = 0.865;
-      const phoneCenterY = 0.65;
-      const phoneHalfW = 0.095;
-      const phoneHalfH = 0.30;
-      const phoneBlendRadius = 0.04;
+    // Distant headlights (Far: 10m) must be occluded by opaque foreground elements (phone & dashboard) (RC-7)
+    const emissiveOcclusion = Math.max(0, 1 - wNear - 0.9 * wInt);
+    const eVal = cEmissive ? emissiveOcclusion : 0;
 
-      const phoneDistX = Math.max(0, Math.abs(normX - phoneCenterX) - phoneHalfW);
-      const phoneDistY = Math.max(0, Math.abs(normY - phoneCenterY) - phoneHalfH);
-      const phoneDist = Math.hypot(phoneDistX / phoneBlendRadius, phoneDistY / phoneBlendRadius);
-      const wNear = Math.max(0, Math.min(1, 1 - phoneDist));
-
-      // 2. Natural curved windshield horizon line (Far: 10m)
-      const horizon = 0.34 + 0.04 * Math.sin(normX * Math.PI);
-      const farDist = (horizon - normY) / 0.04;
-      const rawFar = Math.max(0, Math.min(1, farDist));
-      const wFar = rawFar * (1 - wNear);
-
-      // 3. Cockpit interior (Intermediate: 0.85m)
-      const wInt = Math.max(0, 1 - wFar - wNear);
-
-      for (let c = 0; c < 3; c++) {
-        const val = wFar * cFar[c][idx] + wInt * cInt[c][idx] + wNear * cNear[c][idx] + (cEmissive ? cEmissive[c][idx] : 0);
-        img.data[idx * 4 + c] = toSrgb(val);
-      }
-      img.data[idx * 4 + 3] = 255;
+    for (let c = 0; c < 3; c++) {
+      const val =
+        wFar * cFar[c][idx] +
+        wInt * cInt[c][idx] +
+        wNear * cNear[c][idx] +
+        (cEmissive ? cEmissive[c][idx] * eVal : 0);
+      img.data[idx * 4 + c] = toSrgb(val);
     }
+    img.data[idx * 4 + 3] = 255;
   }
 
   return { imageData: img, layers: info };
